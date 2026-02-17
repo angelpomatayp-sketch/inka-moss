@@ -1,28 +1,40 @@
-:root {
-  --bg: #0f172a;
-  --panel: #111827;
-  --card: #0b1220;
-  --text: #e5e7eb;
-  --muted: #94a3b8;
+ :root {
+  --bg: #07130b;
+  --panel: #0b1a12;
+  --card: #0c1f16;
+  --text: #e7f4ea;
+  --muted: #9ab7a6;
   --accent: #22c55e;
-  --accent-2: #38bdf8;
+  --accent-2: #16a34a;
   --danger: #ef4444;
-  --border: #1f2937;
+  --border: #143125;
 }
 * { box-sizing: border-box; }
 body {
   margin: 0;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background: radial-gradient(1200px 600px at 10% -10%, #1e293b, #0b1020 60%);
+  background: radial-gradient(1200px 600px at 10% -10%, #0f2a1c, #07130b 60%);
   color: var(--text);
 }
 header {
   padding: 24px 28px;
   border-bottom: 1px solid var(--border);
-  background: rgba(15, 23, 42, 0.9);
+  background: rgba(7, 19, 11, 0.9);
   position: sticky;
   top: 0;
   z-index: 5;
+}
+header .logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+header .logo svg {
+  width: 28px;
+  height: 28px;
+  background: #1f7a3d;
+  border-radius: 8px;
+  padding: 4px;
 }
 header h1 { margin: 0 0 4px; font-size: 24px; }
 header p { margin: 0; color: var(--muted); }
@@ -42,7 +54,7 @@ input, select, textarea {
   padding: 10px 12px;
   border-radius: 8px;
   border: 1px solid var(--border);
-  background: #0b1324;
+  background: #0a1a12;
   color: var(--text);
 }
 button {
@@ -62,7 +74,7 @@ button.danger { background: var(--danger); color: #2b0b0b; }
 .tab {
   padding: 8px 10px;
   border-radius: 999px;
-  background: #0b1324;
+  background: #0a1a12;
   border: 1px solid var(--border);
   color: var(--muted);
   cursor: pointer;
