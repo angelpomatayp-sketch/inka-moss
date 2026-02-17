@@ -49,7 +49,7 @@ app.post("/api/auth/register", async (req, res) => {
   if (!name || !email || !password || !role) {
     return res.status(400).json({ error: "Missing required fields" });
   }
-  if (!['RECOLECTOR', 'COMPRADOR', 'ADMIN'].includes(role)) {
+  if (!["RECOLECTOR", "COMPRADOR", "ADMIN"].includes(role)) {
     return res.status(400).json({ error: "Invalid role" });
   }
   const existing = await prisma.user.findUnique({ where: { email } });
@@ -150,6 +150,26 @@ app.post("/api/products/:id/approve", authRequired, roleRequired("ADMIN"), async
     where: { id: product.id },
     data: { status: approved ? "APPROVED" : "REJECTED" }
   });
+  return res.json(updated);
+});
+
+app.patch("/api/products/:id", authRequired, roleRequired("ADMIN"), async (req, res) => {
+  const { name, type, quantityKg, priceSoles, region, photos } = req.body;
+  const data = {};
+  if (name) data.name = name;
+  if (type) data.type = type;
+  if (quantityKg !== undefined) data.quantityKg = Number(quantityKg);
+  if (priceSoles !== undefined) data.priceSoles = Number(priceSoles);
+  if (region) data.region = region;
+  if (photos !== undefined) {
+    if (!Array.isArray(photos)) {
+      return res.status(400).json({ error: "photos must be an array" });
+    }
+    data.photos = photos;
+  }
+  const product = await prisma.product.findUnique({ where: { id: req.params.id } });
+  if (!product) return res.status(404).json({ error: "Product not found" });
+  const updated = await prisma.product.update({ where: { id: product.id }, data });
   return res.json(updated);
 });
 

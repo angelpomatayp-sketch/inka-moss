@@ -158,13 +158,17 @@ async function loadAdminProducts() {
   data.forEach((p) => {
     const div = document.createElement("div");
     div.className = "item";
+    const photo = p.photos && p.photos.length ? p.photos[0] : "";
     div.innerHTML = `
       <div class="item-title">${p.name} <span class="badge">${p.status}</span></div>
       <div class="small">ID: ${p.id} · ${p.owner?.email || ""}</div>
       <div class="small">${p.region} · S/ ${p.priceSoles}</div>
+      <label>Imagen (URL)</label>
+      <input data-photo-id="${p.id}" type="url" value="${photo}" placeholder="https://..." />
       <div style="display:flex; gap:8px; margin-top:8px;">
         <button data-approve="true" data-id="${p.id}">Aprobar</button>
         <button class="danger" data-approve="false" data-id="${p.id}">Rechazar</button>
+        <button class="secondary" data-update="true" data-id="${p.id}">Guardar imagen</button>
       </div>
     `;
     list.appendChild(div);
@@ -178,6 +182,20 @@ async function loadAdminProducts() {
         method: "POST",
         headers: authHeader(),
         body: JSON.stringify({ approved })
+      });
+      loadAdminProducts();
+    });
+  });
+
+  list.querySelectorAll("button[data-update]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const id = btn.getAttribute("data-id");
+      const input = list.querySelector(`input[data-photo-id="${id}"]`);
+      const url = input ? input.value : "";
+      await api(`/api/products/${id}`, {
+        method: "PATCH",
+        headers: authHeader(),
+        body: JSON.stringify({ photos: url ? [url] : [] })
       });
       loadAdminProducts();
     });
