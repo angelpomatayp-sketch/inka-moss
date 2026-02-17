@@ -34,6 +34,8 @@ body {
 .hero h1 { font-family: "Unbounded", system-ui, sans-serif; font-size: 36px; margin:0 0 8px; }
 .hero p { color: var(--muted); margin:0 0 16px; }
 .hero-card { background: var(--card); border:1px solid var(--border); padding:20px; border-radius:16px; box-shadow: var(--shadow); }
+.hero-card ul { margin: 10px 0 16px; padding-left: 18px; color: var(--muted); }
+.hero-card li { margin: 6px 0; }
 .hero-actions { display:flex; gap:12px; margin:16px 0; }
 .hero-actions .cta { background: var(--accent); color:#06210f; padding:12px 16px; border-radius:10px; text-decoration:none; font-weight:800; }
 .hero-actions .ghost { border:1px solid var(--border); padding:12px 16px; border-radius:10px; text-decoration:none; color:var(--text); }

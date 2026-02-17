@@ -197,6 +197,7 @@ function renderCart() {
   if (!list) return;
   const cart = getCart();
   list.innerHTML = "";
+  updateBuyerStats(cart);
   if (cart.length === 0) {
     list.innerHTML = "<div class=\"notice\">Carrito vacío</div>";
     return;
@@ -227,6 +228,16 @@ function renderCart() {
   });
 }
 
+function updateBuyerStats(cart) {
+  const items = cart.reduce((sum, c) => sum + c.quantity, 0);
+  const total = cart.reduce((sum, c) => sum + (c.priceSoles * c.quantity), 0);
+  const elItems = document.getElementById("buy-stat-items");
+  const elTotal = document.getElementById("buy-stat-total");
+  const elViewed = document.getElementById("buy-stat-viewed");
+  if (elItems) elItems.textContent = items;
+  if (elTotal) elTotal.textContent = total.toFixed(2);
+  if (elViewed) elViewed.textContent = "Catálogo";
+}
 function updateCart(productId, delta) {
   const cart = getCart();
   const item = cart.find((c) => c.productId === productId);
@@ -250,6 +261,8 @@ async function loadCatalog() {
   const list = document.getElementById("catalog-list");
   list.innerHTML = "";
   const data = await api("/api/products");
+  const elViewed = document.getElementById("buy-stat-viewed");
+  if (elViewed) elViewed.textContent = data.length;
   data.forEach((p) => {
     const div = document.createElement("div");
     div.className = "item";
