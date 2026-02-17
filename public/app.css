@@ -115,6 +115,14 @@ hr { border: 0; border-top: 1px solid var(--border); margin: 16px 0; }
   cursor: pointer;
 }
 .menu-btn.active { border-color: var(--accent-2); background:#0b1b2d; }
+.section-card { margin-top: 12px; }
+.section-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+.section-head h4 { margin:0; }
+.actions-bar { display:flex; gap:10px; flex-wrap:wrap; margin: 8px 0 12px; }
+.kpi-strip { display:grid; gap:12px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-top: 10px; }
+.kpi { background:#0a1a12; border:1px solid var(--border); border-radius:14px; padding:14px; }
+.kpi span { color: var(--muted); font-size:12px; }
+.kpi strong { display:block; font-size:22px; font-weight:800; }
 .modal.hidden, .drawer.hidden { display: none; }
 .modal { position: fixed; inset: 0; display: grid; place-items: center; z-index: 20; }
 .modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.6); }

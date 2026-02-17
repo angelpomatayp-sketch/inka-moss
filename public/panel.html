@@ -79,16 +79,19 @@
             <div class="notice">Registro, trazabilidad y publicación</div>
           </div>
         </div>
-        <div class="stat-grid" style="margin: 10px 0 16px;">
+        <div class="kpi-strip">
           <div class="stat"><h4>Mis productos</h4><p id="reco-stat-total">-</p></div>
           <div class="stat"><h4>Publicados</h4><p id="reco-stat-published">-</p></div>
           <div class="stat"><h4>Pendientes</h4><p id="reco-stat-pending">-</p></div>
           <div class="stat"><h4>Con trazabilidad</h4><p id="reco-stat-trace">-</p></div>
         </div>
+        <div class="actions-bar">
+          <button id="open-prod-modal" class="secondary">Crear producto</button>
+          <button id="my-products-btn" class="secondary">Cargar mis productos</button>
+        </div>
         <div class="grid">
           <div>
             <h4>Registrar producto</h4>
-            <button id="open-prod-modal" class="secondary">Crear producto</button>
             <div class="notice" id="prod-create-msg"></div>
           </div>
           <div>
@@ -104,12 +107,11 @@
           </div>
         </div>
         <hr />
-        <div>
-          <div class="section-title">
-            <h4 style="margin:0;">Mis productos</h4>
-            <span class="pill">Inventario</span>
+        <div class="section-card">
+          <div class="section-head">
+            <h4>Inventario de productos</h4>
+            <span class="pill">Recolector</span>
           </div>
-          <button id="my-products-btn" class="secondary">Cargar mis productos</button>
           <div class="list" id="my-products-list"></div>
         </div>
       </section>
@@ -121,28 +123,33 @@
             <div class="notice">Catálogo, carrito y pedido</div>
           </div>
         </div>
-        <div class="stat-grid" style="margin: 10px 0 16px;">
+        <div class="kpi-strip">
           <div class="stat"><h4>Items en carrito</h4><p id="buy-stat-items">-</p></div>
           <div class="stat"><h4>Total S/</h4><p id="buy-stat-total">-</p></div>
           <div class="stat"><h4>Productos vistos</h4><p id="buy-stat-viewed">-</p></div>
           <div class="stat"><h4>Estado</h4><p id="buy-stat-status">Activo</p></div>
         </div>
+        <div class="actions-bar">
+          <button id="catalog-btn" class="secondary">Cargar catálogo</button>
+          <button id="open-cart" class="secondary">Abrir carrito</button>
+          <button id="buyer-orders-btn" class="secondary">Cargar pedidos</button>
+        </div>
         <div class="grid">
           <div>
             <h4>Catálogo (HU03)</h4>
-            <button id="catalog-btn" class="secondary">Cargar catálogo</button>
             <div class="list" id="catalog-list"></div>
           </div>
           <div>
             <h4>Carrito</h4>
-            <button id="open-cart" class="secondary">Abrir carrito</button>
             <div class="notice" id="order-msg"></div>
           </div>
         </div>
         <hr />
-        <div>
-          <h4>Mis pedidos</h4>
-          <button id="buyer-orders-btn" class="secondary">Cargar pedidos</button>
+        <div class="section-card">
+          <div class="section-head">
+            <h4>Mis pedidos</h4>
+            <span class="pill">Comprador</span>
+          </div>
           <div class="list" id="buyer-orders-list"></div>
         </div>
       </section>
@@ -154,7 +161,7 @@
             <div class="notice">Gestión de productos y pedidos</div>
           </div>
         </div>
-        <div class="stat-grid" style="margin: 10px 0 16px;">
+        <div class="kpi-strip">
           <div class="stat"><h4>Productos publicados</h4><p id="stat-published">-</p></div>
           <div class="stat"><h4>Productos pendientes</h4><p id="stat-pending">-</p></div>
           <div class="stat"><h4>Pedidos registrados</h4><p id="stat-orders">-</p></div>
@@ -164,12 +171,18 @@
           <button class="menu-btn active" data-admin-view="products">Productos</button>
           <button class="menu-btn" data-admin-view="orders">Pedidos</button>
         </div>
-        <div id="admin-products-view">
-          <button id="admin-products-btn" class="secondary">Cargar productos</button>
+        <div id="admin-products-view" class="section-card">
+          <div class="section-head">
+            <h4>Productos</h4>
+            <button id="admin-products-btn" class="secondary">Cargar productos</button>
+          </div>
           <div class="list" id="admin-products-list"></div>
         </div>
-        <div id="admin-orders-view" class="hidden">
-          <button id="admin-orders-btn" class="secondary">Cargar pedidos</button>
+        <div id="admin-orders-view" class="section-card hidden">
+          <div class="section-head">
+            <h4>Pedidos</h4>
+            <button id="admin-orders-btn" class="secondary">Cargar pedidos</button>
+          </div>
           <div class="list" id="admin-orders-list"></div>
         </div>
       </section>
