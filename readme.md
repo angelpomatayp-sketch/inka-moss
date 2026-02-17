@@ -64,3 +64,8 @@ npm start
 - `POST /api/products/:id/publish` (RECOLECTOR)
 - `GET /api/products` (CATALOGO)
 - `POST /api/orders` (COMPRADOR)
+
+## Accesos de prueba
+- **ADMIN**: `admin@inka.pe` / `Admin123!`
+- **RECOLECTOR**: `recolector@inka.pe` / `Recolector123!`
+- **COMPRADOR**: `comprador@inka.pe` / `Comprador123!`
