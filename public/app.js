@@ -314,12 +314,16 @@ async function loadMyProducts() {
     div.className = "item";
     const img = p.photos && p.photos[0] ? `<img src=\"${p.photos[0]}\" alt=\"${p.name}\" style=\"width:100%;border-radius:8px;margin-bottom:8px;height:140px;object-fit:cover;\" />` : "";
     const canPublish = p.status === "APPROVED";
+    const statusClass = p.status ? p.status.toLowerCase() : "";
     div.innerHTML = `
       ${img}
-      <div class="item-title">${p.name} <span class="badge">${p.status}</span></div>
+      <div class="item-title">${p.name} <span class="status ${statusClass}">${p.status}</span></div>
       <div class="small">ID: ${p.id}</div>
-      <div class="small">${p.region} · S/ ${p.priceSoles}</div>
-      ${canPublish ? `<button data-publish="${p.id}">Publicar</button>` : ""}
+      <div class="small">${p.region} · S/ ${p.priceSoles} · ${p.quantityKg} kg</div>
+      <div style="display:flex; gap:8px; margin-top:6px;">
+        ${canPublish ? `<button data-publish="${p.id}">Publicar</button>` : ""}
+        <button class="secondary" data-copy="${p.id}">Copiar ID</button>
+      </div>
     `;
     list.appendChild(div);
   });
@@ -329,6 +333,13 @@ async function loadMyProducts() {
       const id = btn.getAttribute("data-publish");
       await publishProduct(id);
       loadMyProducts();
+    });
+  });
+
+  list.querySelectorAll("button[data-copy]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const id = btn.getAttribute("data-copy");
+      try { await navigator.clipboard.writeText(id); } catch (_) {}
     });
   });
 }
