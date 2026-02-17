@@ -310,6 +310,7 @@ async function loadAdminProducts() {
   const list = document.getElementById("admin-products-list");
   list.innerHTML = "";
   const data = await api("/api/admin/products", { headers: authHeader() });
+  updateAdminStats(data);
   data.forEach((p) => {
     const div = document.createElement("div");
     div.className = "item";
@@ -365,6 +366,7 @@ async function loadAdminOrders() {
   const list = document.getElementById("admin-orders-list");
   list.innerHTML = "";
   const data = await api("/api/admin/orders", { headers: authHeader() });
+  updateOrdersStat(data);
   if (data.length === 0) {
     list.innerHTML = "<div class=\"notice\">Sin pedidos</div>";
     return;
@@ -379,6 +381,36 @@ async function loadAdminOrders() {
       <div class="small">Items: ${o.items?.length || 0}</div>
     `;
     list.appendChild(div);
+  });
+}
+
+function updateAdminStats(products) {
+  const published = products.filter((p) => p.status === "PUBLISHED").length;
+  const pending = products.filter((p) => p.status === "PENDING").length;
+  const statPublished = document.getElementById("stat-published");
+  const statPending = document.getElementById("stat-pending");
+  if (statPublished) statPublished.textContent = published;
+  if (statPending) statPending.textContent = pending;
+}
+
+function updateOrdersStat(orders) {
+  const statOrders = document.getElementById("stat-orders");
+  if (statOrders) statOrders.textContent = orders.length;
+  const statUsers = document.getElementById("stat-users");
+  if (statUsers) statUsers.textContent = "3";
+}
+
+function initAdminMenu() {
+  const buttons = document.querySelectorAll("[data-admin-view]");
+  const productsView = document.getElementById("admin-products-view");
+  const ordersView = document.getElementById("admin-orders-view");
+  buttons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      buttons.forEach((b) => b.classList.toggle("active", b === btn));
+      const view = btn.getAttribute("data-admin-view");
+      if (productsView) productsView.classList.toggle("hidden", view !== "products");
+      if (ordersView) ordersView.classList.toggle("hidden", view !== "orders");
+    });
   });
 }
 
@@ -417,3 +449,4 @@ initTabs();
 wire();
 setAuth(state.token, state.role, state.userId);
 renderCart();
+initAdminMenu();

@@ -125,13 +125,27 @@
       </section>
 
       <section class="card hidden" id="admin" data-panel>
-        <h3>Administrador</h3>
-        <div>
+        <div class="dashboard-header">
+          <div>
+            <h3 class="section-title">Administrador <span class="pill">Dashboard</span></h3>
+            <div class="notice">Gestión de productos y pedidos</div>
+          </div>
+        </div>
+        <div class="stat-grid" style="margin: 10px 0 16px;">
+          <div class="stat"><h4>Productos publicados</h4><p id="stat-published">-</p></div>
+          <div class="stat"><h4>Productos pendientes</h4><p id="stat-pending">-</p></div>
+          <div class="stat"><h4>Pedidos registrados</h4><p id="stat-orders">-</p></div>
+          <div class="stat"><h4>Usuarios (demo)</h4><p id="stat-users">-</p></div>
+        </div>
+        <div class="admin-menu">
+          <button class="menu-btn active" data-admin-view="products">Productos</button>
+          <button class="menu-btn" data-admin-view="orders">Pedidos</button>
+        </div>
+        <div id="admin-products-view">
           <button id="admin-products-btn" class="secondary">Cargar productos</button>
           <div class="list" id="admin-products-list"></div>
         </div>
-        <hr />
-        <div>
+        <div id="admin-orders-view" class="hidden">
           <button id="admin-orders-btn" class="secondary">Cargar pedidos</button>
           <div class="list" id="admin-orders-list"></div>
         </div>
