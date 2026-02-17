@@ -572,42 +572,46 @@ function initAdminMenu() {
 }
 
 function wire() {
-  document.getElementById("login-btn").addEventListener("click", () => login().catch(e => setStatus(e.message, false)));
-  document.getElementById("reg-btn").addEventListener("click", () => registerUser().catch(e => setStatus(e.message, false)));
-  document.getElementById("logout-btn").addEventListener("click", logout);
+  const onId = (id, fn) => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("click", fn);
+  };
+  onId("login-btn", () => login().catch(e => setStatus(e.message, false)));
+  onId("reg-btn", () => registerUser().catch(e => setStatus(e.message, false)));
+  onId("logout-btn", logout);
 
-  document.getElementById("prod-create-btn").addEventListener("click", () => createProduct().catch(e => {
-    document.getElementById("prod-create-msg").textContent = e.message;
+  onId("prod-create-btn", () => createProduct().catch(e => {
+    const msg = document.getElementById("prod-create-msg");
+    if (msg) msg.textContent = e.message;
   }));
-  document.getElementById("open-prod-modal").addEventListener("click", openModal);
-  document.querySelectorAll("[data-close-modal]").forEach((el) => {
-    el.addEventListener("click", closeModal);
-  });
-  document.querySelectorAll("[data-close-edit]").forEach((el) => {
-    el.addEventListener("click", closeEditModal);
-  });
-  document.getElementById("trace-btn").addEventListener("click", () => addTraceability().catch(e => {
-    document.getElementById("trace-msg").textContent = e.message;
-  }));
-  document.getElementById("publish-btn").addEventListener("click", () => publishProductFromInput().catch(e => {
-    document.getElementById("publish-msg").textContent = e.message;
-  }));
-  document.getElementById("my-products-btn").addEventListener("click", () => loadMyProducts().catch(e => {
-    document.getElementById("my-products-list").innerHTML = `<div class="error">${e.message}</div>`;
-  }));
-  document.getElementById("catalog-btn").addEventListener("click", () => loadCatalog().catch(e => {
-    document.getElementById("catalog-list").innerHTML = `<div class="error">${e.message}</div>`;
-  }));
-  document.getElementById("order-btn").addEventListener("click", () => createOrder().catch(e => {
-    document.getElementById("order-msg").textContent = e.message;
-  }));
-  document.getElementById("buyer-orders-btn").addEventListener("click", () => loadBuyerOrders().catch(e => {
-    document.getElementById("buyer-orders-list").innerHTML = `<div class="error">${e.message}</div>`;
-  }));
-  document.getElementById("open-cart").addEventListener("click", openCart);
-  document.getElementById("close-cart").addEventListener("click", closeCart);
+  onId("open-prod-modal", openModal);
+  document.querySelectorAll("[data-close-modal]").forEach((el) => el.addEventListener("click", closeModal));
+  document.querySelectorAll("[data-close-edit]").forEach((el) => el.addEventListener("click", closeEditModal));
 
-  document.getElementById("edit-save-btn").addEventListener("click", async () => {
+  onId("publish-btn", () => publishProductFromInput().catch(e => {
+    const msg = document.getElementById("publish-msg");
+    if (msg) msg.textContent = e.message;
+  }));
+  onId("my-products-btn", () => loadMyProducts().catch(e => {
+    const list = document.getElementById("my-products-list");
+    if (list) list.innerHTML = `<div class=\"error\">${e.message}</div>`;
+  }));
+  onId("catalog-btn", () => loadCatalog().catch(e => {
+    const list = document.getElementById("catalog-list");
+    if (list) list.innerHTML = `<div class=\"error\">${e.message}</div>`;
+  }));
+  onId("order-btn", () => createOrder().catch(e => {
+    const msg = document.getElementById("order-msg");
+    if (msg) msg.textContent = e.message;
+  }));
+  onId("buyer-orders-btn", () => loadBuyerOrders().catch(e => {
+    const list = document.getElementById("buyer-orders-list");
+    if (list) list.innerHTML = `<div class=\"error\">${e.message}</div>`;
+  }));
+  onId("open-cart", openCart);
+  onId("close-cart", closeCart);
+
+  onId("edit-save-btn", async () => {
     const id = document.getElementById("edit-id").value;
     if (!validateRequired(["edit-name","edit-type","edit-qty","edit-price","edit-region"])) return;
     const body = {
@@ -632,18 +636,19 @@ function wire() {
     }
     closeEditModal();
     loadMyProducts();
-    showToast("Producto actualizado");
   });
-  document.getElementById("admin-products-btn").addEventListener("click", () => loadAdminProducts().catch(e => {
-    document.getElementById("admin-products-list").innerHTML = `<div class="error">${e.message}</div>`;
+  onId("admin-products-btn", () => loadAdminProducts().catch(e => {
+    const list = document.getElementById("admin-products-list");
+    if (list) list.innerHTML = `<div class=\"error\">${e.message}</div>`;
   }));
-  document.getElementById("admin-orders-btn").addEventListener("click", () => loadAdminOrders().catch(e => {
-    document.getElementById("admin-orders-list").innerHTML = `<div class="error">${e.message}</div>`;
+  onId("admin-orders-btn", () => loadAdminOrders().catch(e => {
+    const list = document.getElementById("admin-orders-list");
+    if (list) list.innerHTML = `<div class=\"error\">${e.message}</div>`;
   }));
 }
-
 initTabs();
 wire();
 setAuth(state.token, state.role, state.userId);
 renderCart();
 initAdminMenu();
+
