@@ -77,6 +77,7 @@ async function registerUser() {
 
 function logout() {
   setAuth("", "", "");
+  window.location.href = "/login.html";
 }
 
 function applyRoleUI() {
@@ -93,6 +94,18 @@ function applyRoleUI() {
       t.classList.toggle("active", isRoleTab);
     });
     switchTab(state.role.toLowerCase());
+    // preload dashboard data by role
+    if (state.role === "ADMIN") {
+      loadAdminProducts().catch(() => {});
+      loadAdminOrders().catch(() => {});
+    }
+    if (state.role === "RECOLECTOR") {
+      loadMyProducts().catch(() => {});
+    }
+    if (state.role === "COMPRADOR") {
+      loadCatalog().catch(() => {});
+      renderCart();
+    }
   } else {
     if (loginBox) loginBox.classList.remove("hidden");
     if (registerBox) registerBox.classList.remove("hidden");
@@ -282,6 +295,7 @@ async function loadMyProducts() {
   const list = document.getElementById("my-products-list");
   list.innerHTML = "";
   const data = await api("/api/recolector/products", { headers: authHeader() });
+  updateRecolectorStats(data);
   data.forEach((p) => {
     const div = document.createElement("div");
     div.className = "item";
@@ -304,6 +318,21 @@ async function loadMyProducts() {
       loadMyProducts();
     });
   });
+}
+
+function updateRecolectorStats(products) {
+  const total = products.length;
+  const published = products.filter((p) => p.status === "PUBLISHED").length;
+  const pending = products.filter((p) => p.status === "PENDING").length;
+  const trace = products.filter((p) => p.traceability).length;
+  const elTotal = document.getElementById("reco-stat-total");
+  const elPub = document.getElementById("reco-stat-published");
+  const elPen = document.getElementById("reco-stat-pending");
+  const elTrace = document.getElementById("reco-stat-trace");
+  if (elTotal) elTotal.textContent = total;
+  if (elPub) elPub.textContent = published;
+  if (elPen) elPen.textContent = pending;
+  if (elTrace) elTrace.textContent = trace;
 }
 
 async function loadAdminProducts() {
