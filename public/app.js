@@ -157,6 +157,7 @@ async function createProduct() {
     body: JSON.stringify(body)
   });
   document.getElementById("prod-create-msg").textContent = `Producto creado: ${data.id} (status ${data.status})`;
+  showToast("Producto creado");
 }
 
 async function addTraceability() {
@@ -190,6 +191,7 @@ async function publishProductFromInput() {
   }
   const data = await publishProduct(productId);
   document.getElementById("publish-msg").textContent = `Producto publicado: ${data.id}`;
+  showToast("Producto publicado");
 }
 
 function getCart() {
@@ -332,6 +334,7 @@ async function createOrder() {
   document.getElementById("order-msg").textContent = `Pedido creado: ${data.id}`;
   saveCart([]);
   renderCart();
+  showToast("Pedido creado");
 }
 
 async function loadMyProducts() {
@@ -432,6 +435,18 @@ function validateRequired(ids) {
   return ok;
 }
 
+function showToast(message, type = "success") {
+  const el = document.getElementById("toast");
+  if (!el) return;
+  el.textContent = message;
+  el.className = `toast ${type}`;
+  el.classList.remove("hidden");
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => {
+    el.classList.add("hidden");
+  }, 2500);
+}
+
 function updateRecolectorStats(products) {
   const total = products.length;
   const published = products.filter((p) => p.status === "PUBLISHED").length;
@@ -499,6 +514,7 @@ async function loadAdminProducts() {
       const msg = document.getElementById(`admin-msg-${id}`);
       if (msg) msg.textContent = "Imagen actualizada.";
       loadAdminProducts();
+      showToast("Imagen actualizada");
     });
   });
 }
@@ -616,6 +632,7 @@ function wire() {
     }
     closeEditModal();
     loadMyProducts();
+    showToast("Producto actualizado");
   });
   document.getElementById("admin-products-btn").addEventListener("click", () => loadAdminProducts().catch(e => {
     document.getElementById("admin-products-list").innerHTML = `<div class="error">${e.message}</div>`;
