@@ -1,4 +1,4 @@
- :root {
+:root {
   --bg: #07130b;
   --panel: #0b1a12;
   --card: #0c1f16;
@@ -8,12 +8,13 @@
   --accent-2: #16a34a;
   --danger: #ef4444;
   --border: #143125;
+  --shadow: 0 16px 40px rgba(0,0,0,0.35);
 }
 * { box-sizing: border-box; }
 body {
   margin: 0;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background: radial-gradient(1200px 600px at 10% -10%, #0f2a1c, #07130b 60%);
+  font-family: "Source Sans 3", "Segoe UI", Tahoma, sans-serif;
+  background: radial-gradient(1200px 600px at 10% -10%, #12301f, #07130b 60%);
   color: var(--text);
 }
 header {
@@ -23,6 +24,7 @@ header {
   position: sticky;
   top: 0;
   z-index: 5;
+  backdrop-filter: blur(8px);
 }
 header .logo {
   display: flex;
@@ -30,29 +32,29 @@ header .logo {
   gap: 10px;
 }
 header .logo svg {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   background: #1f7a3d;
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 4px;
 }
-header h1 { margin: 0 0 4px; font-size: 24px; }
+header h1 { margin: 0 0 4px; font-size: 24px; font-family: "Unbounded", system-ui, sans-serif; }
 header p { margin: 0; color: var(--muted); }
-main { max-width: 1100px; margin: 0 auto; padding: 24px; }
+main { max-width: 1200px; margin: 0 auto; padding: 24px; }
 .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
 .card {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: var(--shadow);
 }
 .card h3 { margin-top: 0; }
 label { display: block; font-size: 13px; color: var(--muted); margin: 8px 0 4px; }
 input, select, textarea {
   width: 100%;
   padding: 10px 12px;
-  border-radius: 8px;
+  border-radius: 10px;
   border: 1px solid var(--border);
   background: #0a1a12;
   color: var(--text);
@@ -61,10 +63,10 @@ button {
   margin-top: 10px;
   padding: 10px 12px;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   background: var(--accent);
   color: #06210f;
-  font-weight: 700;
+  font-weight: 800;
   cursor: pointer;
 }
 button.secondary { background: var(--accent-2); color: #062039; }
@@ -80,45 +82,33 @@ button.danger { background: var(--danger); color: #2b0b0b; }
   cursor: pointer;
 }
 .tab.active { color: white; border-color: var(--accent-2); background: #0b1b2d; }
-.admin-menu { display:flex; gap:10px; margin: 8px 0 16px; }
-.menu-btn {
-  padding: 8px 12px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: #0b1324;
-  color: var(--text);
-  cursor: pointer;
-}
-.menu-btn.active { border-color: var(--accent-2); background:#0b1b2d; }
 .hidden { display: none; }
 .list { display: grid; gap: 10px; }
-.item { border: 1px solid var(--border); border-radius: 10px; padding: 10px; background: #0b1324; }
-.item-title { font-weight: 600; }
+.item { border: 1px solid var(--border); border-radius: 12px; padding: 10px; background: #0a1a12; box-shadow: 0 8px 24px rgba(0,0,0,0.25); }
+.item-title { font-weight: 700; }
 .small { font-size: 12px; color: var(--muted); }
 hr { border: 0; border-top: 1px solid var(--border); margin: 16px 0; }
 .notice { font-size: 13px; color: var(--muted); }
 .success { color: #86efac; }
 .error { color: #fca5a5; }
-.dashboard {
-  display: grid;
-  gap: 16px;
-}
-.dashboard-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+.dashboard { display: grid; gap: 16px; }
+.dashboard-header { display: flex; justify-content: space-between; align-items: center; }
 .stat-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
-.stat {
-  background: #0b1324;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 12px;
-}
+.stat { background: #0a1a12; border: 1px solid var(--border); border-radius: 12px; padding: 12px; }
 .stat h4 { margin: 0 0 6px; font-size: 13px; color: var(--muted); }
-.stat p { margin: 0; font-size: 20px; font-weight: 700; }
+.stat p { margin: 0; font-size: 20px; font-weight: 800; }
 .section-title { display: flex; align-items: center; gap: 10px; margin: 0 0 10px; }
 .pill { padding: 2px 8px; border-radius: 999px; background: #0b1b2d; color: var(--muted); font-size: 12px; }
+.admin-menu { display:flex; gap:10px; margin: 8px 0 16px; }
+.menu-btn {
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #0a1a12;
+  color: var(--text);
+  cursor: pointer;
+}
+.menu-btn.active { border-color: var(--accent-2); background:#0b1b2d; }
 
 @media (max-width: 700px) {
   header h1 { font-size: 20px; }
