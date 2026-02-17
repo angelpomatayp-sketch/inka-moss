@@ -110,13 +110,101 @@ async function addTraceability() {
   document.getElementById("trace-msg").textContent = `Trazabilidad registrada: ${data.id}`;
 }
 
-async function publishProduct() {
-  const productId = document.getElementById("publish-product-id").value;
+async function publishProduct(productId) {
   const data = await api(`/api/products/${productId}/publish`, {
     method: "POST",
     headers: authHeader()
   });
+  return data;
+}
+
+async function publishProductFromInput() {
+  const productId = document.getElementById("publish-product-id").value;
+  const data = await publishProduct(productId);
   document.getElementById("publish-msg").textContent = `Producto publicado: ${data.id}`;
+}
+
+function getCart() {
+  try {
+    return JSON.parse(localStorage.getItem("cart") || "[]");
+  } catch (_) {
+    return [];
+  }
+}
+
+function saveCart(cart) {
+  localStorage.setItem("cart", JSON.stringify(cart));
+}
+
+function addToCart(product) {
+  const cart = getCart();
+  const existing = cart.find((c) => c.productId === product.id);
+  if (existing) {
+    existing.quantity += 1;
+  } else {
+    cart.push({
+      productId: product.id,
+      name: product.name,
+      priceSoles: product.priceSoles,
+      quantity: 1
+    });
+  }
+  saveCart(cart);
+  renderCart();
+}
+
+function renderCart() {
+  const list = document.getElementById("cart-list");
+  if (!list) return;
+  const cart = getCart();
+  list.innerHTML = "";
+  if (cart.length === 0) {
+    list.innerHTML = "<div class=\"notice\">Carrito vacío</div>";
+    return;
+  }
+  cart.forEach((item) => {
+    const div = document.createElement("div");
+    div.className = "item";
+    div.innerHTML = `
+      <div class=\"item-title\">${item.name}</div>
+      <div class=\"small\">S/ ${item.priceSoles} · Cantidad: ${item.quantity}</div>
+      <div style=\"display:flex; gap:6px; margin-top:6px;\">
+        <button data-cart-dec="${item.productId}">-</button>
+        <button class=\"secondary\" data-cart-inc="${item.productId}\">+</button>
+        <button class=\"danger\" data-cart-del="${item.productId}\">Quitar</button>
+      </div>
+    `;
+    list.appendChild(div);
+  });
+
+  list.querySelectorAll("button[data-cart-inc]").forEach((btn) => {
+    btn.addEventListener("click", () => updateCart(btn.getAttribute("data-cart-inc"), 1));
+  });
+  list.querySelectorAll("button[data-cart-dec]").forEach((btn) => {
+    btn.addEventListener("click", () => updateCart(btn.getAttribute("data-cart-dec"), -1));
+  });
+  list.querySelectorAll("button[data-cart-del]").forEach((btn) => {
+    btn.addEventListener("click", () => removeFromCart(btn.getAttribute("data-cart-del")));
+  });
+}
+
+function updateCart(productId, delta) {
+  const cart = getCart();
+  const item = cart.find((c) => c.productId === productId);
+  if (!item) return;
+  item.quantity += delta;
+  if (item.quantity <= 0) {
+    removeFromCart(productId);
+    return;
+  }
+  saveCart(cart);
+  renderCart();
+}
+
+function removeFromCart(productId) {
+  const cart = getCart().filter((c) => c.productId !== productId);
+  saveCart(cart);
+  renderCart();
 }
 
 async function loadCatalog() {
@@ -126,22 +214,33 @@ async function loadCatalog() {
   data.forEach((p) => {
     const div = document.createElement("div");
     div.className = "item";
+    const img = p.photos && p.photos[0] ? `<img src=\"${p.photos[0]}\" alt=\"${p.name}\" style=\"width:100%;border-radius:8px;margin-bottom:8px;height:140px;object-fit:cover;\" />` : "";
     div.innerHTML = `
+      ${img}
       <div class="item-title">${p.name} <span class="badge">${p.type}</span></div>
       <div class="small">${p.region} · S/ ${p.priceSoles} · ${p.quantityKg} kg</div>
       <div class="small">ID: ${p.id}</div>
+      <button data-add="${p.id}">Agregar al carrito</button>
     `;
     list.appendChild(div);
+  });
+
+  list.querySelectorAll("button[data-add]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-add");
+      const product = data.find((p) => p.id === id);
+      if (product) addToCart(product);
+    });
   });
 }
 
 async function createOrder() {
+  const cart = getCart();
+  const address = document.getElementById("order-address").value;
+  if (cart.length === 0) throw new Error("Carrito vacío");
   const body = {
-    address: document.getElementById("order-address").value,
-    items: [{
-      productId: document.getElementById("order-product-id").value,
-      quantity: Number(document.getElementById("order-qty").value)
-    }]
+    address,
+    items: cart.map((c) => ({ productId: c.productId, quantity: c.quantity }))
   };
   const data = await api("/api/orders", {
     method: "POST",
@@ -149,6 +248,36 @@ async function createOrder() {
     body: JSON.stringify(body)
   });
   document.getElementById("order-msg").textContent = `Pedido creado: ${data.id}`;
+  saveCart([]);
+  renderCart();
+}
+
+async function loadMyProducts() {
+  const list = document.getElementById("my-products-list");
+  list.innerHTML = "";
+  const data = await api("/api/recolector/products", { headers: authHeader() });
+  data.forEach((p) => {
+    const div = document.createElement("div");
+    div.className = "item";
+    const img = p.photos && p.photos[0] ? `<img src=\"${p.photos[0]}\" alt=\"${p.name}\" style=\"width:100%;border-radius:8px;margin-bottom:8px;height:140px;object-fit:cover;\" />` : "";
+    const canPublish = p.status === "APPROVED";
+    div.innerHTML = `
+      ${img}
+      <div class="item-title">${p.name} <span class="badge">${p.status}</span></div>
+      <div class="small">ID: ${p.id}</div>
+      <div class="small">${p.region} · S/ ${p.priceSoles}</div>
+      ${canPublish ? `<button data-publish="${p.id}">Publicar</button>` : ""}
+    `;
+    list.appendChild(div);
+  });
+
+  list.querySelectorAll("button[data-publish]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const id = btn.getAttribute("data-publish");
+      await publishProduct(id);
+      loadMyProducts();
+    });
+  });
 }
 
 async function loadAdminProducts() {
@@ -163,7 +292,7 @@ async function loadAdminProducts() {
       <div class="item-title">${p.name} <span class="badge">${p.status}</span></div>
       <div class="small">ID: ${p.id} · ${p.owner?.email || ""}</div>
       <div class="small">${p.region} · S/ ${p.priceSoles}</div>
-      ${photo ? `<img src="${photo}" alt="${p.name}" style="width:100%;border-radius:8px;margin-top:8px;" />` : ""}
+      ${photo ? `<img src="${photo}" alt="${p.name}" style="width:100%;border-radius:8px;margin-top:8px;height:140px;object-fit:cover;" />` : ""}
       <label>Imagen (URL)</label>
       <input data-photo-id="${p.id}" type="url" value="${photo}" placeholder="https://..." />
       <div style="display:flex; gap:8px; margin-top:8px;">
@@ -206,6 +335,27 @@ async function loadAdminProducts() {
   });
 }
 
+async function loadAdminOrders() {
+  const list = document.getElementById("admin-orders-list");
+  list.innerHTML = "";
+  const data = await api("/api/admin/orders", { headers: authHeader() });
+  if (data.length === 0) {
+    list.innerHTML = "<div class=\"notice\">Sin pedidos</div>";
+    return;
+  }
+  data.forEach((o) => {
+    const div = document.createElement("div");
+    div.className = "item";
+    div.innerHTML = `
+      <div class="item-title">Pedido ${o.id} <span class="badge">${o.status}</span></div>
+      <div class="small">Comprador: ${o.buyer?.email || ""}</div>
+      <div class="small">Dirección: ${o.address}</div>
+      <div class="small">Items: ${o.items?.length || 0}</div>
+    `;
+    list.appendChild(div);
+  });
+}
+
 function wire() {
   document.getElementById("login-btn").addEventListener("click", () => login().catch(e => setStatus(e.message, false)));
   document.getElementById("reg-btn").addEventListener("click", () => registerUser().catch(e => setStatus(e.message, false)));
@@ -217,8 +367,11 @@ function wire() {
   document.getElementById("trace-btn").addEventListener("click", () => addTraceability().catch(e => {
     document.getElementById("trace-msg").textContent = e.message;
   }));
-  document.getElementById("publish-btn").addEventListener("click", () => publishProduct().catch(e => {
+  document.getElementById("publish-btn").addEventListener("click", () => publishProductFromInput().catch(e => {
     document.getElementById("publish-msg").textContent = e.message;
+  }));
+  document.getElementById("my-products-btn").addEventListener("click", () => loadMyProducts().catch(e => {
+    document.getElementById("my-products-list").innerHTML = `<div class="error">${e.message}</div>`;
   }));
   document.getElementById("catalog-btn").addEventListener("click", () => loadCatalog().catch(e => {
     document.getElementById("catalog-list").innerHTML = `<div class="error">${e.message}</div>`;
@@ -229,8 +382,12 @@ function wire() {
   document.getElementById("admin-products-btn").addEventListener("click", () => loadAdminProducts().catch(e => {
     document.getElementById("admin-products-list").innerHTML = `<div class="error">${e.message}</div>`;
   }));
+  document.getElementById("admin-orders-btn").addEventListener("click", () => loadAdminOrders().catch(e => {
+    document.getElementById("admin-orders-list").innerHTML = `<div class="error">${e.message}</div>`;
+  }));
 }
 
 initTabs();
 wire();
 setAuth(state.token, state.role, state.userId);
+renderCart();

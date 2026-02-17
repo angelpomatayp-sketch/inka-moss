@@ -8,11 +8,20 @@ async function api(path) {
   return data;
 }
 
-document.getElementById("load-btn").addEventListener("click", async () => {
+async function loadCatalog() {
   const list = document.getElementById("list");
   list.innerHTML = "";
+  const q = document.getElementById("filter-q").value.trim();
+  const type = document.getElementById("filter-type").value.trim();
+  const region = document.getElementById("filter-region").value.trim();
+  const params = new URLSearchParams();
+  if (q) params.set("q", q);
+  if (type) params.set("type", type);
+  if (region) params.set("region", region);
+  const url = `/api/products${params.toString() ? `?${params}` : ""}`;
+
   try {
-    const data = await api("/api/products");
+    const data = await api(url);
     data.forEach((p) => {
       const div = document.createElement("div");
       div.className = "item";
@@ -28,4 +37,7 @@ document.getElementById("load-btn").addEventListener("click", async () => {
   } catch (e) {
     list.innerHTML = `<div class=\"notice\">${e.message}</div>`;
   }
-});
+}
+
+document.getElementById("load-btn").addEventListener("click", loadCatalog);
+document.addEventListener("DOMContentLoaded", loadCatalog);

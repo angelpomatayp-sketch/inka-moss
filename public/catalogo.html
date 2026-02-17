@@ -20,7 +20,23 @@
     <main class="page">
       <div class="card">
         <h2>Catálogo público</h2>
-        <button id="load-btn" class="secondary">Cargar productos</button>
+        <div class="grid" style="margin-bottom:12px;">
+          <div>
+            <label>Buscar</label>
+            <input id="filter-q" type="text" placeholder="Sphagnum, verde, etc." />
+          </div>
+          <div>
+            <label>Tipo</label>
+            <input id="filter-type" type="text" placeholder="Sphagnum" />
+          </div>
+          <div>
+            <label>Región</label>
+            <input id="filter-region" type="text" placeholder="Junín" />
+          </div>
+          <div style="align-self:end;">
+            <button id="load-btn" class="secondary">Filtrar</button>
+          </div>
+        </div>
         <div class="list" id="list"></div>
       </div>
     </main>

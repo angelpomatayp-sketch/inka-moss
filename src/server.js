@@ -95,14 +95,23 @@ app.post("/api/products", authRequired, roleRequired("RECOLECTOR"), async (req, 
 });
 
 app.get("/api/products", async (req, res) => {
-  const { type, region } = req.query;
+  const { type, region, q } = req.query;
   const products = await prisma.product.findMany({
     where: {
       status: "PUBLISHED",
+      ...(q ? { name: { contains: String(q), mode: "insensitive" } } : {}),
       ...(type ? { type: String(type) } : {}),
       ...(region ? { region: String(region) } : {})
     },
     include: { traceability: true, owner: { select: { name: true } } }
+  });
+  return res.json(products);
+});
+
+app.get("/api/recolector/products", authRequired, roleRequired("RECOLECTOR"), async (req, res) => {
+  const products = await prisma.product.findMany({
+    where: { ownerId: req.user.id },
+    include: { traceability: true }
   });
   return res.json(products);
 });
@@ -206,6 +215,13 @@ app.get("/api/admin/products", authRequired, roleRequired("ADMIN"), async (_req,
     include: { owner: { select: { name: true, email: true } }, traceability: true }
   });
   return res.json(products);
+});
+
+app.get("/api/admin/orders", authRequired, roleRequired("ADMIN"), async (_req, res) => {
+  const orders = await prisma.order.findMany({
+    include: { buyer: { select: { name: true, email: true } }, items: true }
+  });
+  return res.json(orders);
 });
 
 app.use((err, _req, res, _next) => {
