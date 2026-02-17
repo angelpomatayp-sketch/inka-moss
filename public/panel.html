@@ -20,10 +20,11 @@
         </svg>
         <h1>Inka Moss</h1>
       </div>
-      <nav style="margin-left:auto; display:flex; gap:16px;">
+      <nav style="margin-left:auto; display:flex; gap:16px; align-items:center;">
         <a href="/" style="color:var(--text); text-decoration:none; font-weight:600;">Inicio</a>
         <a href="/catalogo.html" style="color:var(--text); text-decoration:none; font-weight:600;">Catálogo</a>
         <a href="/panel.html" style="color:var(--text); text-decoration:none; font-weight:600;">Panel</a>
+        <button id="logout-top" class="danger" style="margin:0;">Cerrar sesión</button>
       </nav>
       <p style="flex-basis:100%; margin-top:6px;">Panel único con acceso por roles (Recolector, Comprador, Admin).</p>
     </header>
@@ -112,7 +113,7 @@
             <h4>Inventario de productos</h4>
             <span class="pill">Recolector</span>
           </div>
-          <div class="list" id="my-products-list"></div>
+          <div class="list cards" id="my-products-list"></div>
         </div>
       </section>
 
@@ -137,7 +138,7 @@
         <div class="grid">
           <div>
             <h4>Catálogo (HU03)</h4>
-            <div class="list" id="catalog-list"></div>
+            <div class="list cards" id="catalog-list"></div>
           </div>
           <div>
             <h4>Carrito</h4>
@@ -150,7 +151,7 @@
             <h4>Mis pedidos</h4>
             <span class="pill">Comprador</span>
           </div>
-          <div class="list" id="buyer-orders-list"></div>
+          <div class="list cards" id="buyer-orders-list"></div>
         </div>
       </section>
 
@@ -176,14 +177,14 @@
             <h4>Productos</h4>
             <button id="admin-products-btn" class="secondary">Cargar productos</button>
           </div>
-          <div class="list" id="admin-products-list"></div>
+          <div class="list cards" id="admin-products-list"></div>
         </div>
         <div id="admin-orders-view" class="section-card hidden">
           <div class="section-head">
             <h4>Pedidos</h4>
             <button id="admin-orders-btn" class="secondary">Cargar pedidos</button>
           </div>
-          <div class="list" id="admin-orders-list"></div>
+          <div class="list cards" id="admin-orders-list"></div>
         </div>
       </section>
     </main>

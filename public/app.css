@@ -85,6 +85,7 @@ button.danger { background: var(--danger); color: #2b0b0b; }
 .tab.active { color: white; border-color: var(--accent-2); background: #0b1b2d; }
 .hidden { display: none; }
 .list { display: grid; gap: 10px; }
+.list.cards { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
 .item { border: 1px solid var(--border); border-radius: 12px; padding: 10px; background: #0a1a12; box-shadow: 0 8px 24px rgba(0,0,0,0.25); }
 .item-title { font-weight: 700; }
 .small { font-size: 12px; color: var(--muted); }

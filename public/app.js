@@ -579,6 +579,7 @@ function wire() {
   onId("login-btn", () => login().catch(e => setStatus(e.message, false)));
   onId("reg-btn", () => registerUser().catch(e => setStatus(e.message, false)));
   onId("logout-btn", logout);
+  onId("logout-top", logout);
 
   onId("prod-create-btn", () => createProduct().catch(e => {
     const msg = document.getElementById("prod-create-msg");
