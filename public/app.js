@@ -20,6 +20,7 @@ function setAuth(token, role, userId) {
   localStorage.setItem("role", role || "");
   localStorage.setItem("userId", userId || "");
   setStatus(token ? `Autenticado como ${role}` : "No autenticado", !!token);
+  applyRoleUI();
 }
 
 function authHeader() {
@@ -76,6 +77,31 @@ async function registerUser() {
 
 function logout() {
   setAuth("", "", "");
+}
+
+function applyRoleUI() {
+  const loginBox = document.getElementById("login-box");
+  const registerBox = document.getElementById("register-box");
+  const tabs = document.querySelectorAll(".tab");
+  if (state.token && state.role) {
+    if (loginBox) loginBox.classList.add("hidden");
+    if (registerBox) registerBox.classList.add("hidden");
+    // show only relevant tab/panel
+    tabs.forEach((t) => {
+      const isRoleTab = t.dataset.tab?.toUpperCase() === state.role;
+      t.classList.toggle("hidden", !isRoleTab);
+      t.classList.toggle("active", isRoleTab);
+    });
+    switchTab(state.role.toLowerCase());
+  } else {
+    if (loginBox) loginBox.classList.remove("hidden");
+    if (registerBox) registerBox.classList.remove("hidden");
+    tabs.forEach((t, i) => {
+      t.classList.remove("hidden");
+      t.classList.toggle("active", i === 0);
+    });
+    switchTab("recolector");
+  }
 }
 
 async function createProduct() {
