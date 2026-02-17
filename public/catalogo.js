@@ -14,6 +14,7 @@ async function loadCatalog() {
   const q = document.getElementById("filter-q").value.trim();
   const type = document.getElementById("filter-type").value.trim();
   const region = document.getElementById("filter-region").value.trim();
+  const sortBy = document.getElementById("sort-by").value;
   const params = new URLSearchParams();
   if (q) params.set("q", q);
   if (type) params.set("type", type);
@@ -21,7 +22,11 @@ async function loadCatalog() {
   const url = `/api/products${params.toString() ? `?${params}` : ""}`;
 
   try {
-    const data = await api(url);
+    let data = await api(url);
+    if (sortBy === "price-asc") data = data.sort((a, b) => a.priceSoles - b.priceSoles);
+    if (sortBy === "price-desc") data = data.sort((a, b) => b.priceSoles - a.priceSoles);
+    const count = document.getElementById("result-count");
+    if (count) count.textContent = `${data.length} productos`;
     data.forEach((p) => {
       const div = document.createElement("div");
       div.className = "item";
@@ -29,8 +34,10 @@ async function loadCatalog() {
       div.innerHTML = `
         ${img}
         <div><strong>${p.name}</strong> <span class=\"badge\">${p.type}</span></div>
-        <div class=\"notice\">${p.region} · S/ ${p.priceSoles} · ${p.quantityKg} kg</div>
+        <div class=\"meta notice\">${p.region} · ${p.quantityKg} kg</div>
+        <div class=\"price\">S/ ${p.priceSoles}</div>
         <div class=\"notice\">Trazabilidad: ${p.traceability?.community || "-"}</div>
+        <button class=\"cta\">Ver detalle</button>
       `;
       list.appendChild(div);
     });
@@ -40,4 +47,5 @@ async function loadCatalog() {
 }
 
 document.getElementById("load-btn").addEventListener("click", loadCatalog);
+document.getElementById("sort-by").addEventListener("change", loadCatalog);
 document.addEventListener("DOMContentLoaded", loadCatalog);
