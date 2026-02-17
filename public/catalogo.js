@@ -1,4 +1,29 @@
 const apiBase = "";
+const authState = {
+  token: localStorage.getItem("token"),
+  role: localStorage.getItem("role"),
+  email: localStorage.getItem("email")
+};
+
+function updateNav() {
+  const loginLink = document.getElementById("login-link");
+  const registerLink = document.getElementById("register-link");
+  const navUser = document.getElementById("nav-user");
+  const logoutBtn = document.getElementById("nav-logout");
+  const logged = !!authState.token;
+  if (loginLink) loginLink.style.display = logged ? "none" : "";
+  if (registerLink) registerLink.style.display = logged ? "none" : "";
+  if (navUser) navUser.textContent = logged ? `${authState.email || "Usuario"} · ${authState.role || ""}` : "";
+  if (logoutBtn) logoutBtn.style.display = logged ? "inline-flex" : "none";
+}
+
+function logout() {
+  localStorage.removeItem("token");
+  localStorage.removeItem("role");
+  localStorage.removeItem("userId");
+  localStorage.removeItem("email");
+  window.location.reload();
+}
 async function api(path) {
   const res = await fetch(apiBase + path);
   const text = await res.text();
@@ -48,4 +73,9 @@ async function loadCatalog() {
 
 document.getElementById("load-btn").addEventListener("click", loadCatalog);
 document.getElementById("sort-by").addEventListener("change", loadCatalog);
-document.addEventListener("DOMContentLoaded", loadCatalog);
+document.addEventListener("DOMContentLoaded", () => {
+  updateNav();
+  const logoutBtn = document.getElementById("nav-logout");
+  if (logoutBtn) logoutBtn.addEventListener("click", logout);
+  loadCatalog();
+});
