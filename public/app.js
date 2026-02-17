@@ -163,6 +163,7 @@ async function loadAdminProducts() {
       <div class="item-title">${p.name} <span class="badge">${p.status}</span></div>
       <div class="small">ID: ${p.id} · ${p.owner?.email || ""}</div>
       <div class="small">${p.region} · S/ ${p.priceSoles}</div>
+      ${photo ? `<img src="${photo}" alt="${p.name}" style="width:100%;border-radius:8px;margin-top:8px;" />` : ""}
       <label>Imagen (URL)</label>
       <input data-photo-id="${p.id}" type="url" value="${photo}" placeholder="https://..." />
       <div style="display:flex; gap:8px; margin-top:8px;">
@@ -170,6 +171,7 @@ async function loadAdminProducts() {
         <button class="danger" data-approve="false" data-id="${p.id}">Rechazar</button>
         <button class="secondary" data-update="true" data-id="${p.id}">Guardar imagen</button>
       </div>
+      <div class="small" id="admin-msg-${p.id}"></div>
     `;
     list.appendChild(div);
   });
@@ -197,6 +199,8 @@ async function loadAdminProducts() {
         headers: authHeader(),
         body: JSON.stringify({ photos: url ? [url] : [] })
       });
+      const msg = document.getElementById(`admin-msg-${id}`);
+      if (msg) msg.textContent = "Imagen actualizada.";
       loadAdminProducts();
     });
   });
