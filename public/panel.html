@@ -171,6 +171,7 @@
         <div class="admin-menu">
           <button class="menu-btn active" data-admin-view="products">Productos</button>
           <button class="menu-btn" data-admin-view="orders">Pedidos</button>
+          <button class="menu-btn" data-admin-view="users">Usuarios</button>
         </div>
         <div id="admin-products-view" class="section-card">
           <div class="section-head">
@@ -185,6 +186,13 @@
             <button id="admin-orders-btn" class="secondary">Cargar pedidos</button>
           </div>
           <div class="list cards" id="admin-orders-list"></div>
+        </div>
+        <div id="admin-users-view" class="section-card hidden">
+          <div class="section-head">
+            <h4>Usuarios</h4>
+            <button id="admin-users-btn" class="secondary">Cargar usuarios</button>
+          </div>
+          <div class="list cards" id="admin-users-list"></div>
         </div>
       </section>
     </main>
@@ -277,6 +285,17 @@
         <div class="modal-actions">
           <button id="edit-save-btn">Guardar cambios</button>
         </div>
+      </div>
+    </div>
+
+    <div class="modal hidden" id="detail-modal">
+      <div class="modal-backdrop" data-close-detail></div>
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3>Detalle del producto</h3>
+          <button class="icon-btn" data-close-detail>✕</button>
+        </div>
+        <div id="detail-body"></div>
       </div>
     </div>
 

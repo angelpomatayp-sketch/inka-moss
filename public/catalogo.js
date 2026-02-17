@@ -62,9 +62,36 @@ async function loadCatalog() {
         <div class=\"meta notice\">${p.region} · ${p.quantityKg} kg</div>
         <div class=\"price\">S/ ${p.priceSoles}</div>
         <div class=\"notice\">Trazabilidad: ${p.traceability?.community || "-"}</div>
-        <button class=\"cta\">Ver detalle</button>
+        <button class=\"cta\" data-detail="${p.id}">Ver detalle</button>
       `;
       list.appendChild(div);
+    });
+
+    list.querySelectorAll("button[data-detail]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const id = btn.getAttribute("data-detail");
+        const p = data.find((x) => x.id === id);
+        if (!p) return;
+        const img = p.photos && p.photos[0] ? `<img src="${p.photos[0]}" alt="${p.name}" style="width:100%;border-radius:12px;margin-bottom:12px;height:240px;object-fit:cover;" />` : "";
+        const trace = p.traceability ? `
+          <div class="small">Zona: ${p.traceability.zone}</div>
+          <div class="small">Comunidad: ${p.traceability.community}</div>
+          <div class="small">Fecha: ${new Date(p.traceability.harvestDate).toLocaleDateString()}</div>
+        ` : `<div class="small">Sin trazabilidad registrada</div>`;
+        const body = document.getElementById("detail-body");
+        if (body) {
+          body.innerHTML = `
+            ${img}
+            <div class="item-title">${p.name} <span class="badge">${p.type}</span></div>
+            <div class="notice">${p.region} · ${p.quantityKg} kg</div>
+            <div class="price">S/ ${p.priceSoles}</div>
+            <hr />
+            <div class="item-title">Trazabilidad</div>
+            ${trace}
+          `;
+        }
+        document.getElementById("detail-modal").classList.remove("hidden");
+      });
     });
   } catch (e) {
     list.innerHTML = `<div class=\"notice\">${e.message}</div>`;
@@ -77,5 +104,8 @@ document.addEventListener("DOMContentLoaded", () => {
   updateNav();
   const logoutBtn = document.getElementById("nav-logout");
   if (logoutBtn) logoutBtn.addEventListener("click", logout);
+  document.querySelectorAll("[data-close-detail]").forEach((el) => el.addEventListener("click", () => {
+    document.getElementById("detail-modal").classList.add("hidden");
+  }));
   loadCatalog();
 });

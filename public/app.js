@@ -99,6 +99,16 @@ function closeEditModal() {
   document.getElementById("edit-modal").classList.add("hidden");
 }
 
+function openDetailModal(html) {
+  const body = document.getElementById("detail-body");
+  if (body) body.innerHTML = html;
+  document.getElementById("detail-modal").classList.remove("hidden");
+}
+
+function closeDetailModal() {
+  document.getElementById("detail-modal").classList.add("hidden");
+}
+
 function openCart() {
   document.getElementById("cart-drawer").classList.remove("hidden");
 }
@@ -365,6 +375,7 @@ async function loadMyProducts() {
       <div class="small">Flujo: Registrar → Trazabilidad → Admin aprueba → Publicar</div>
       <div style="display:flex; gap:8px; margin-top:6px;">
         ${canPublish ? `<button data-publish="${p.id}">Publicar</button>` : ""}
+        <button class="secondary" data-detail="${p.id}">Ver detalle</button>
         <button class="secondary" data-edit="${p.id}">Editar</button>
         <button class="secondary" data-copy="${p.id}">Copiar ID</button>
       </div>
@@ -401,6 +412,30 @@ async function loadMyProducts() {
         document.getElementById("edit-date").value = "";
       }
       openEditModal();
+    });
+  });
+
+  list.querySelectorAll("button[data-detail]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-detail");
+      const p = data.find((x) => x.id === id);
+      if (!p) return;
+      const img = p.photos && p.photos[0] ? `<img src="${p.photos[0]}" alt="${p.name}" style="width:100%;border-radius:12px;margin-bottom:12px;height:220px;object-fit:cover;" />` : "";
+      const trace = p.traceability ? `
+        <div class="small">Zona: ${p.traceability.zone}</div>
+        <div class="small">Comunidad: ${p.traceability.community}</div>
+        <div class="small">Fecha: ${new Date(p.traceability.harvestDate).toLocaleDateString()}</div>
+      ` : `<div class="small">Sin trazabilidad registrada</div>`;
+      openDetailModal(`
+        ${img}
+        <div class="item-title">${p.name} <span class="badge">${p.status}</span></div>
+        <div class="small">${p.region} · S/ ${p.priceSoles} · ${p.quantityKg} kg</div>
+        <div class="small">Tipo: ${p.type}</div>
+        <div class="small">ID: ${p.id}</div>
+        <hr />
+        <div class="item-title">Trazabilidad</div>
+        ${trace}
+      `);
     });
   });
 
@@ -492,6 +527,7 @@ async function loadAdminProducts() {
       <label>Imagen (URL)</label>
       <input class="inline-input" data-photo-id="${p.id}" type="url" value="${photo}" placeholder="https://..." />
       <div class="actions">
+        <button class="secondary" data-detail="${p.id}">Ver detalle</button>
         <button data-approve="true" data-id="${p.id}">Aprobar</button>
         <button class="danger" data-approve="false" data-id="${p.id}">Rechazar</button>
         <button class="secondary" data-update="true" data-id="${p.id}">Guardar imagen</button>
@@ -528,6 +564,31 @@ async function loadAdminProducts() {
       if (msg) msg.textContent = "Imagen actualizada.";
       loadAdminProducts();
       showToast("Imagen actualizada");
+    });
+  });
+
+  list.querySelectorAll("button[data-detail]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-detail");
+      const p = data.find((x) => x.id === id);
+      if (!p) return;
+      const img = p.photos && p.photos[0] ? `<img src="${p.photos[0]}" alt="${p.name}" style="width:100%;border-radius:12px;margin-bottom:12px;height:220px;object-fit:cover;" />` : "";
+      const trace = p.traceability ? `
+        <div class="small">Zona: ${p.traceability.zone}</div>
+        <div class="small">Comunidad: ${p.traceability.community}</div>
+        <div class="small">Fecha: ${new Date(p.traceability.harvestDate).toLocaleDateString()}</div>
+      ` : `<div class="small">Sin trazabilidad registrada</div>`;
+      openDetailModal(`
+        ${img}
+        <div class="item-title">${p.name} <span class="badge">${p.status}</span></div>
+        <div class="small">${p.region} · S/ ${p.priceSoles} · ${p.quantityKg} kg</div>
+        <div class="small">Tipo: ${p.type}</div>
+        <div class="small">Recolector: ${p.owner?.email || "—"}</div>
+        <div class="small">ID: ${p.id}</div>
+        <hr />
+        <div class="item-title">Trazabilidad</div>
+        ${trace}
+      `);
     });
   });
 }
@@ -570,16 +631,58 @@ function updateOrdersStat(orders) {
   if (statUsers) statUsers.textContent = "3";
 }
 
+async function loadAdminUsers() {
+  const list = document.getElementById("admin-users-list");
+  list.innerHTML = "";
+  const data = await api("/api/admin/users", { headers: authHeader() });
+  data.forEach((u) => {
+    const div = document.createElement("div");
+    div.className = "item";
+    div.innerHTML = `
+      <div class="item-title">${u.name || "Usuario"}</div>
+      <div class="small">${u.email}</div>
+      <div class="small">ID: ${u.id}</div>
+      <label>Rol</label>
+      <select data-user-role="${u.id}">
+        <option value="RECOLECTOR"${u.role === "RECOLECTOR" ? " selected" : ""}>RECOLECTOR</option>
+        <option value="COMPRADOR"${u.role === "COMPRADOR" ? " selected" : ""}>COMPRADOR</option>
+        <option value="ADMIN"${u.role === "ADMIN" ? " selected" : ""}>ADMIN</option>
+      </select>
+      <button class="secondary" data-user-save="${u.id}">Guardar rol</button>
+      <div class="small" id="user-msg-${u.id}"></div>
+    `;
+    list.appendChild(div);
+  });
+
+  list.querySelectorAll("button[data-user-save]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const id = btn.getAttribute("data-user-save");
+      const sel = list.querySelector(`select[data-user-role="${id}"]`);
+      const role = sel ? sel.value : "";
+      await api(`/api/admin/users/${id}`, {
+        method: "PATCH",
+        headers: authHeader(),
+        body: JSON.stringify({ role })
+      });
+      const msg = document.getElementById(`user-msg-${id}`);
+      if (msg) msg.textContent = "Rol actualizado";
+      showToast("Rol actualizado");
+    });
+  });
+}
+
 function initAdminMenu() {
   const buttons = document.querySelectorAll("[data-admin-view]");
   const productsView = document.getElementById("admin-products-view");
   const ordersView = document.getElementById("admin-orders-view");
+  const usersView = document.getElementById("admin-users-view");
   buttons.forEach((btn) => {
     btn.addEventListener("click", () => {
       buttons.forEach((b) => b.classList.toggle("active", b === btn));
       const view = btn.getAttribute("data-admin-view");
       if (productsView) productsView.classList.toggle("hidden", view !== "products");
       if (ordersView) ordersView.classList.toggle("hidden", view !== "orders");
+      if (usersView) usersView.classList.toggle("hidden", view !== "users");
     });
   });
 }
@@ -600,6 +703,7 @@ function wire() {
   onId("open-prod-modal", openModal);
   document.querySelectorAll("[data-close-modal]").forEach((el) => el.addEventListener("click", closeModal));
   document.querySelectorAll("[data-close-edit]").forEach((el) => el.addEventListener("click", closeEditModal));
+  document.querySelectorAll("[data-close-detail]").forEach((el) => el.addEventListener("click", closeDetailModal));
 
   onId("publish-btn", () => publishProductFromInput().catch(e => {
     const msg = document.getElementById("publish-msg");
@@ -656,6 +760,10 @@ function wire() {
   }));
   onId("admin-orders-btn", () => loadAdminOrders().catch(e => {
     const list = document.getElementById("admin-orders-list");
+    if (list) list.innerHTML = `<div class=\"error\">${e.message}</div>`;
+  }));
+  onId("admin-users-btn", () => loadAdminUsers().catch(e => {
+    const list = document.getElementById("admin-users-list");
     if (list) list.innerHTML = `<div class=\"error\">${e.message}</div>`;
   }));
 }

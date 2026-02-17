@@ -232,6 +232,27 @@ app.get("/api/admin/orders", authRequired, roleRequired("ADMIN"), async (_req, r
   return res.json(orders);
 });
 
+app.get("/api/admin/users", authRequired, roleRequired("ADMIN"), async (_req, res) => {
+  const users = await prisma.user.findMany({
+    select: { id: true, name: true, email: true, role: true, createdAt: true }
+  });
+  return res.json(users);
+});
+
+app.patch("/api/admin/users/:id", authRequired, roleRequired("ADMIN"), async (req, res) => {
+  const { role } = req.body;
+  if (!["RECOLECTOR", "COMPRADOR", "ADMIN"].includes(role)) {
+    return res.status(400).json({ error: "Invalid role" });
+  }
+  const user = await prisma.user.findUnique({ where: { id: req.params.id } });
+  if (!user) return res.status(404).json({ error: "User not found" });
+  const updated = await prisma.user.update({
+    where: { id: user.id },
+    data: { role }
+  });
+  return res.json({ id: updated.id, role: updated.role });
+});
+
 app.use((err, _req, res, _next) => {
   // eslint-disable-next-line no-console
   console.error(err);
