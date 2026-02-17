@@ -142,6 +142,7 @@ function applyRoleUI() {
 }
 
 async function createProduct() {
+  if (!validateRequired(["prod-name","prod-type","prod-qty","prod-price","prod-region","prod-photo"])) return;
   const body = {
     name: document.getElementById("prod-name").value,
     type: document.getElementById("prod-type").value,
@@ -183,6 +184,10 @@ async function publishProduct(productId) {
 
 async function publishProductFromInput() {
   const productId = document.getElementById("publish-product-id").value;
+  if (!productId) {
+    document.getElementById("publish-msg").textContent = "Ingresa un ID válido.";
+    return;
+  }
   const data = await publishProduct(productId);
   document.getElementById("publish-msg").textContent = `Producto publicado: ${data.id}`;
 }
@@ -314,6 +319,7 @@ async function createOrder() {
   const cart = getCart();
   const address = document.getElementById("order-address").value;
   if (cart.length === 0) throw new Error("Carrito vacío");
+  if (!address) throw new Error("Dirección requerida");
   const body = {
     address,
     items: cart.map((c) => ({ productId: c.productId, quantity: c.quantity }))
@@ -344,6 +350,7 @@ async function loadMyProducts() {
       <div class="item-title">${p.name} <span class="status ${statusClass}">${p.status}</span></div>
       <div class="small">ID: ${p.id}</div>
       <div class="small">${p.region} · S/ ${p.priceSoles} · ${p.quantityKg} kg</div>
+      <div class="small">Flujo: Registrar → Trazabilidad → Admin aprueba → Publicar</div>
       <div style="display:flex; gap:8px; margin-top:6px;">
         ${canPublish ? `<button data-publish="${p.id}">Publicar</button>` : ""}
         <button class="secondary" data-edit="${p.id}">Editar</button>
@@ -391,6 +398,38 @@ async function loadMyProducts() {
       try { await navigator.clipboard.writeText(id); } catch (_) {}
     });
   });
+}
+
+async function loadBuyerOrders() {
+  const list = document.getElementById("buyer-orders-list");
+  list.innerHTML = "";
+  const data = await api("/api/buyer/orders", { headers: authHeader() });
+  if (data.length === 0) {
+    list.innerHTML = "<div class=\"notice\">Sin pedidos</div>";
+    return;
+  }
+  data.forEach((o) => {
+    const div = document.createElement("div");
+    div.className = "item";
+    div.innerHTML = `
+      <div class="item-title">Pedido ${o.id} <span class="badge">${o.status}</span></div>
+      <div class="small">Dirección: ${o.address}</div>
+      <div class="small">Items: ${o.items?.length || 0}</div>
+    `;
+    list.appendChild(div);
+  });
+}
+
+function validateRequired(ids) {
+  let ok = true;
+  ids.forEach((id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const empty = !String(el.value || "").trim();
+    el.style.borderColor = empty ? "#ef4444" : "";
+    if (empty) ok = false;
+  });
+  return ok;
 }
 
 function updateRecolectorStats(products) {
@@ -546,11 +585,15 @@ function wire() {
   document.getElementById("order-btn").addEventListener("click", () => createOrder().catch(e => {
     document.getElementById("order-msg").textContent = e.message;
   }));
+  document.getElementById("buyer-orders-btn").addEventListener("click", () => loadBuyerOrders().catch(e => {
+    document.getElementById("buyer-orders-list").innerHTML = `<div class="error">${e.message}</div>`;
+  }));
   document.getElementById("open-cart").addEventListener("click", openCart);
   document.getElementById("close-cart").addEventListener("click", closeCart);
 
   document.getElementById("edit-save-btn").addEventListener("click", async () => {
     const id = document.getElementById("edit-id").value;
+    if (!validateRequired(["edit-name","edit-type","edit-qty","edit-price","edit-region"])) return;
     const body = {
       name: document.getElementById("edit-name").value,
       type: document.getElementById("edit-type").value,

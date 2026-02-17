@@ -210,6 +210,14 @@ app.post("/api/orders", authRequired, roleRequired("COMPRADOR"), async (req, res
   return res.status(201).json(order);
 });
 
+app.get("/api/buyer/orders", authRequired, roleRequired("COMPRADOR"), async (req, res) => {
+  const orders = await prisma.order.findMany({
+    where: { buyerId: req.user.id },
+    include: { items: true }
+  });
+  return res.json(orders);
+});
+
 app.get("/api/admin/products", authRequired, roleRequired("ADMIN"), async (_req, res) => {
   const products = await prisma.product.findMany({
     include: { owner: { select: { name: true, email: true } }, traceability: true }
