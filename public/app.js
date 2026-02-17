@@ -107,10 +107,12 @@ function closeCart() {
 function applyRoleUI() {
   const loginBox = document.getElementById("login-box");
   const registerBox = document.getElementById("register-box");
+  const sessionCard = document.getElementById("session-card");
   const tabs = document.querySelectorAll(".tab");
   if (state.token && state.role) {
     if (loginBox) loginBox.classList.add("hidden");
     if (registerBox) registerBox.classList.add("hidden");
+    if (sessionCard) sessionCard.classList.add("hidden");
     // show only relevant tab/panel
     tabs.forEach((t) => {
       const isRoleTab = t.dataset.tab?.toUpperCase() === state.role;
@@ -133,6 +135,7 @@ function applyRoleUI() {
   } else {
     if (loginBox) loginBox.classList.remove("hidden");
     if (registerBox) registerBox.classList.remove("hidden");
+    if (sessionCard) sessionCard.classList.remove("hidden");
     tabs.forEach((t, i) => {
       t.classList.remove("hidden");
       t.classList.toggle("active", i === 0);
