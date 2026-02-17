@@ -3,7 +3,8 @@ const apiBase = "";
 const state = {
   token: localStorage.getItem("token"),
   role: localStorage.getItem("role"),
-  userId: localStorage.getItem("userId")
+  userId: localStorage.getItem("userId"),
+  email: localStorage.getItem("email")
 };
 
 function setStatus(msg, ok = true) {
@@ -12,13 +13,15 @@ function setStatus(msg, ok = true) {
   el.className = ok ? "notice success" : "notice error";
 }
 
-function setAuth(token, role, userId) {
+function setAuth(token, role, userId, email) {
   state.token = token;
   state.role = role;
   state.userId = userId;
+  state.email = email || "";
   localStorage.setItem("token", token || "");
   localStorage.setItem("role", role || "");
   localStorage.setItem("userId", userId || "");
+  localStorage.setItem("email", email || "");
   setStatus(token ? `Autenticado como ${role}` : "No autenticado", !!token);
   applyRoleUI();
 }
@@ -60,7 +63,7 @@ async function login() {
     method: "POST",
     body: JSON.stringify({ email, password })
   });
-  setAuth(data.token, data.role, data.userId);
+  setAuth(data.token, data.role, data.userId, email);
 }
 
 async function registerUser() {
@@ -76,7 +79,7 @@ async function registerUser() {
 }
 
 function logout() {
-  setAuth("", "", "");
+  setAuth("", "", "", "");
   window.location.href = "/login.html";
 }
 
@@ -108,11 +111,13 @@ function applyRoleUI() {
   const loginBox = document.getElementById("login-box");
   const registerBox = document.getElementById("register-box");
   const sessionCard = document.getElementById("session-card");
+  const navUser = document.getElementById("nav-user");
   const tabs = document.querySelectorAll(".tab");
   if (state.token && state.role) {
     if (loginBox) loginBox.classList.add("hidden");
     if (registerBox) registerBox.classList.add("hidden");
     if (sessionCard) sessionCard.classList.add("hidden");
+    if (navUser) navUser.textContent = state.email ? `${state.email} · ${state.role}` : state.role;
     // show only relevant tab/panel
     tabs.forEach((t) => {
       const isRoleTab = t.dataset.tab?.toUpperCase() === state.role;
@@ -136,6 +141,7 @@ function applyRoleUI() {
     if (loginBox) loginBox.classList.remove("hidden");
     if (registerBox) registerBox.classList.remove("hidden");
     if (sessionCard) sessionCard.classList.remove("hidden");
+    if (navUser) navUser.textContent = "";
     tabs.forEach((t, i) => {
       t.classList.remove("hidden");
       t.classList.toggle("active", i === 0);
