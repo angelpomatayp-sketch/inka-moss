@@ -71,6 +71,7 @@ button {
 }
 button.secondary { background: var(--accent-2); color: #062039; }
 button.danger { background: var(--danger); color: #2b0b0b; }
+.icon-btn { background: transparent; color: var(--text); border: 0; font-size: 18px; cursor: pointer; }
 .badge { display:inline-block; padding:4px 8px; border-radius:999px; background:#0b1b2d; color:var(--muted); font-size:12px; }
 .tabs { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
 .tab {
@@ -114,6 +115,14 @@ hr { border: 0; border-top: 1px solid var(--border); margin: 16px 0; }
   cursor: pointer;
 }
 .menu-btn.active { border-color: var(--accent-2); background:#0b1b2d; }
+.modal.hidden, .drawer.hidden { display: none; }
+.modal { position: fixed; inset: 0; display: grid; place-items: center; z-index: 20; }
+.modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.6); }
+.modal-card { position: relative; background: var(--card); border:1px solid var(--border); border-radius:16px; padding:18px; width: min(900px, 92vw); box-shadow: var(--shadow); z-index: 1; }
+.modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+.modal-actions { margin-top: 12px; display:flex; justify-content:flex-end; }
+.drawer { position: fixed; top:0; right:0; height:100vh; width:min(420px, 92vw); background: var(--card); border-left:1px solid var(--border); padding:18px; box-shadow: var(--shadow); z-index: 25; }
+.drawer-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
 
 @media (max-width: 700px) {
   header h1 { font-size: 20px; }

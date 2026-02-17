@@ -80,6 +80,22 @@ function logout() {
   window.location.href = "/login.html";
 }
 
+function openModal() {
+  document.getElementById("prod-modal").classList.remove("hidden");
+}
+
+function closeModal() {
+  document.getElementById("prod-modal").classList.add("hidden");
+}
+
+function openCart() {
+  document.getElementById("cart-drawer").classList.remove("hidden");
+}
+
+function closeCart() {
+  document.getElementById("cart-drawer").classList.add("hidden");
+}
+
 function applyRoleUI() {
   const loginBox = document.getElementById("login-box");
   const registerBox = document.getElementById("register-box");
@@ -475,6 +491,10 @@ function wire() {
   document.getElementById("prod-create-btn").addEventListener("click", () => createProduct().catch(e => {
     document.getElementById("prod-create-msg").textContent = e.message;
   }));
+  document.getElementById("open-prod-modal").addEventListener("click", openModal);
+  document.querySelectorAll("[data-close-modal]").forEach((el) => {
+    el.addEventListener("click", closeModal);
+  });
   document.getElementById("trace-btn").addEventListener("click", () => addTraceability().catch(e => {
     document.getElementById("trace-msg").textContent = e.message;
   }));
@@ -490,6 +510,8 @@ function wire() {
   document.getElementById("order-btn").addEventListener("click", () => createOrder().catch(e => {
     document.getElementById("order-msg").textContent = e.message;
   }));
+  document.getElementById("open-cart").addEventListener("click", openCart);
+  document.getElementById("close-cart").addEventListener("click", closeCart);
   document.getElementById("admin-products-btn").addEventListener("click", () => loadAdminProducts().catch(e => {
     document.getElementById("admin-products-list").innerHTML = `<div class="error">${e.message}</div>`;
   }));
