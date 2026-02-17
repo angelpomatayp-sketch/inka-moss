@@ -469,16 +469,20 @@ async function loadAdminProducts() {
   updateAdminStats(data);
   data.forEach((p) => {
     const div = document.createElement("div");
-    div.className = "item";
+    div.className = "item product-card admin-card";
     const photo = p.photos && p.photos.length ? p.photos[0] : "";
     div.innerHTML = `
-      <div class="item-title">${p.name} <span class="badge">${p.status}</span></div>
-      <div class="small">ID: ${p.id} · ${p.owner?.email || ""}</div>
-      <div class="small">${p.region} · S/ ${p.priceSoles}</div>
-      ${photo ? `<img src="${photo}" alt="${p.name}" style="width:100%;border-radius:8px;margin-top:8px;height:140px;object-fit:cover;" />` : ""}
+      ${photo ? `<img src="${photo}" alt="${p.name}" />` : `<div class="notice">Sin imagen</div>`}
+      <div class="meta-row">
+        <div class="item-title">${p.name}</div>
+        <span class="badge">${p.status}</span>
+      </div>
+      <div class="small">${p.region} · <span class="price">S/ ${p.priceSoles}</span></div>
+      <div class="small">ID: ${p.id}</div>
+      <div class="small">Recolector: ${p.owner?.email || "—"}</div>
       <label>Imagen (URL)</label>
-      <input data-photo-id="${p.id}" type="url" value="${photo}" placeholder="https://..." />
-      <div style="display:flex; gap:8px; margin-top:8px;">
+      <input class="inline-input" data-photo-id="${p.id}" type="url" value="${photo}" placeholder="https://..." />
+      <div class="actions">
         <button data-approve="true" data-id="${p.id}">Aprobar</button>
         <button class="danger" data-approve="false" data-id="${p.id}">Rechazar</button>
         <button class="secondary" data-update="true" data-id="${p.id}">Guardar imagen</button>
