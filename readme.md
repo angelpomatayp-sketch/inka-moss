@@ -1,71 +1,43 @@
-# Inka Moss - MVP
+# Inka Moss MVP
 
-Este repositorio contiene el MVP del sistema web de comercio sostenible para Inka Moss.
+## Descripción general
+Plataforma web de **comercio sostenible** para la empresa Inka Moss. Digitaliza la recolección, publicación y venta de musgo natural, conectando recolectores, compradores y administradores en un solo canal, con trazabilidad del origen y control administrativo.
 
-## Alcance del MVP
-Historias de usuario incluidas:
-- HU01 Registro de productos.
-- HU02 Publicación en catálogo (solo aprobados).
-- HU03 Visualización de catálogo.
-- HU04 Registro de pedidos.
-- HU05 Registro de trazabilidad.
+## Objetivo general
+Diseñar e implementar un sistema web que gestione la recolección, publicación y venta del musgo natural mediante procesos digitales integrados, trazabilidad del producto y un canal comercial unificado, para mejorar la organización operativa, ampliar la visibilidad comercial y fortalecer el modelo de negocio sostenible durante el primer año.
 
-Roles del MVP:
-- RECOLECTOR
-- COMPRADOR
-- ADMIN
+## Objetivos específicos
+1. Diseñar y validar prototipos funcionales del sistema web con usuarios reales, garantizando usabilidad.
+2. Implementar módulos de registro de productos, usuarios, catálogo, pedidos y trazabilidad con buen rendimiento (<3s en pruebas).
+3. Incorporar un panel administrativo para validación, aprobación y control antes del despliegue.
 
-## Stack
-- Backend: Node.js + Express
-- DB: PostgreSQL
-- ORM: Prisma
-- Frontend: HTML/CSS/JS (estático)
+## Alcance
+Incluye plataforma web, interfaces, módulos funcionales, pruebas funcionales e integración, y validación en entorno de pruebas.
 
-## Variables de entorno
-Crea un archivo `.env` con:
+No incluye app móvil, pasarelas de pago online, automatización logística externa ni infraestructura productiva.
 
-```
-DATABASE_URL=postgresql://USER:PASS@HOST:PORT/DB
-JWT_SECRET=tu_secreto
-PORT=3000
-```
-
-## Ejecutar en local
-```
-npm install
-npx prisma generate
-npx prisma migrate dev --name init
-npm run dev
-```
-
-## Deploy en Render
-1. Crea un **Web Service** en Render y conecta el repo.
-2. Crea un **PostgreSQL** en Render y copia el `DATABASE_URL`.
-3. Configura variables de entorno en Render:
-   - `DATABASE_URL`
-   - `JWT_SECRET`
-4. Build command:
-```
-npm install
-npx prisma generate
-npx prisma migrate deploy
-```
-5. Start command:
-```
-npm start
-```
-
-## Endpoints principales
-- `POST /api/auth/register`
-- `POST /api/auth/login`
-- `POST /api/products` (RECOLECTOR)
-- `POST /api/products/:id/traceability` (RECOLECTOR)
-- `POST /api/products/:id/approve` (ADMIN)
-- `POST /api/products/:id/publish` (RECOLECTOR)
-- `GET /api/products` (CATALOGO)
-- `POST /api/orders` (COMPRADOR)
+## Funcionalidades principales
+- Registro y autenticación por roles (recolector, comprador, admin).
+- Registro de productos (tipo, cantidad, precio, región, fotos).
+- Publicación en catálogo y visualización pública.
+- Registro de pedidos por compradores.
+- Registro de trazabilidad (zona, comunidad, fecha).
+- Panel administrativo para aprobación y control.
 
 ## Accesos de prueba
 - **ADMIN**: `admin@inka.pe` / `Admin123!`
 - **RECOLECTOR**: `recolector@inka.pe` / `Recolector123!`
 - **COMPRADOR**: `comprador@inka.pe` / `Comprador123!`
+
+## Rutas principales
+- `/` Inicio público
+- `/catalogo.html` Catálogo público
+- `/login.html` Ingreso
+- `/register.html` Registro
+- `/panel.html` Panel por roles
+
+## Stack
+- Backend: Node.js + Express
+- DB: PostgreSQL
+- ORM: Prisma
+- Frontend: HTML/CSS/JS
