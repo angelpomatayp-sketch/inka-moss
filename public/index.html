@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Inka Moss MVP</title>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 32px; line-height: 1.5; }
+      code { background: #f4f4f4; padding: 2px 6px; border-radius: 4px; }
+      .card { border: 1px solid #ddd; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+    </style>
+  </head>
+  <body>
+    <h1>Inka Moss MVP</h1>
+    <p>Backend activo. Usa los endpoints del API para probar el MVP.</p>
+
+    <div class="card">
+      <h3>Endpoints principales</h3>
+      <ul>
+        <li><code>POST /api/auth/register</code></li>
+        <li><code>POST /api/auth/login</code></li>
+        <li><code>POST /api/products</code> (RECOLECTOR)</li>
+        <li><code>POST /api/products/:id/traceability</code> (RECOLECTOR)</li>
+        <li><code>POST /api/products/:id/approve</code> (ADMIN)</li>
+        <li><code>POST /api/products/:id/publish</code> (RECOLECTOR)</li>
+        <li><code>GET /api/products</code> (CATALOGO)</li>
+        <li><code>POST /api/orders</code> (COMPRADOR)</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Health check</h3>
+      <p><code>GET /api/health</code></p>
+    </div>
+  </body>
+</html>
