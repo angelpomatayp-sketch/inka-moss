@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     data.forEach((p) => {
       const div = document.createElement("div");
       div.className = "item";
-      const img = p.photos && p.photos[0] ? `<img src=\"${p.photos[0]}\" alt=\"${p.name}\" style=\"width:100%;border-radius:8px;\" />` : "";
+      const img = p.photos && p.photos[0] ? `<img src=\"${p.photos[0]}\" alt=\"${p.name}\" />` : "";
       div.innerHTML = `
         ${img}
         <div><strong>${p.name}</strong> <span class=\"badge\">${p.type}</span></div>
