@@ -88,6 +88,14 @@ function closeModal() {
   document.getElementById("prod-modal").classList.add("hidden");
 }
 
+function openEditModal() {
+  document.getElementById("edit-modal").classList.remove("hidden");
+}
+
+function closeEditModal() {
+  document.getElementById("edit-modal").classList.add("hidden");
+}
+
 function openCart() {
   document.getElementById("cart-drawer").classList.remove("hidden");
 }
@@ -338,6 +346,7 @@ async function loadMyProducts() {
       <div class="small">${p.region} · S/ ${p.priceSoles} · ${p.quantityKg} kg</div>
       <div style="display:flex; gap:8px; margin-top:6px;">
         ${canPublish ? `<button data-publish="${p.id}">Publicar</button>` : ""}
+        <button class="secondary" data-edit="${p.id}">Editar</button>
         <button class="secondary" data-copy="${p.id}">Copiar ID</button>
       </div>
     `;
@@ -349,6 +358,30 @@ async function loadMyProducts() {
       const id = btn.getAttribute("data-publish");
       await publishProduct(id);
       loadMyProducts();
+    });
+  });
+
+  list.querySelectorAll("button[data-edit]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const id = btn.getAttribute("data-edit");
+      const p = data.find((x) => x.id === id);
+      if (!p) return;
+      document.getElementById("edit-id").value = p.id;
+      document.getElementById("edit-name").value = p.name || "";
+      document.getElementById("edit-type").value = p.type || "";
+      document.getElementById("edit-qty").value = p.quantityKg || "";
+      document.getElementById("edit-price").value = p.priceSoles || "";
+      document.getElementById("edit-region").value = p.region || "";
+      document.getElementById("edit-photo").value = (p.photos && p.photos[0]) ? p.photos[0] : "";
+      document.getElementById("edit-zone").value = p.traceability?.zone || "";
+      document.getElementById("edit-community").value = p.traceability?.community || "";
+      if (p.traceability?.harvestDate) {
+        const d = new Date(p.traceability.harvestDate);
+        document.getElementById("edit-date").value = d.toISOString().slice(0,10);
+      } else {
+        document.getElementById("edit-date").value = "";
+      }
+      openEditModal();
     });
   });
 
@@ -495,6 +528,9 @@ function wire() {
   document.querySelectorAll("[data-close-modal]").forEach((el) => {
     el.addEventListener("click", closeModal);
   });
+  document.querySelectorAll("[data-close-edit]").forEach((el) => {
+    el.addEventListener("click", closeEditModal);
+  });
   document.getElementById("trace-btn").addEventListener("click", () => addTraceability().catch(e => {
     document.getElementById("trace-msg").textContent = e.message;
   }));
@@ -512,6 +548,32 @@ function wire() {
   }));
   document.getElementById("open-cart").addEventListener("click", openCart);
   document.getElementById("close-cart").addEventListener("click", closeCart);
+
+  document.getElementById("edit-save-btn").addEventListener("click", async () => {
+    const id = document.getElementById("edit-id").value;
+    const body = {
+      name: document.getElementById("edit-name").value,
+      type: document.getElementById("edit-type").value,
+      quantityKg: Number(document.getElementById("edit-qty").value),
+      priceSoles: Number(document.getElementById("edit-price").value),
+      region: document.getElementById("edit-region").value,
+      photos: [document.getElementById("edit-photo").value]
+    };
+    await api(`/api/products/${id}`, { method: "PATCH", headers: authHeader(), body: JSON.stringify(body) });
+
+    const zone = document.getElementById("edit-zone").value;
+    const community = document.getElementById("edit-community").value;
+    const harvestDate = document.getElementById("edit-date").value;
+    if (zone && community && harvestDate) {
+      await api(`/api/products/${id}/traceability`, {
+        method: "POST",
+        headers: authHeader(),
+        body: JSON.stringify({ zone, community, harvestDate })
+      });
+    }
+    closeEditModal();
+    loadMyProducts();
+  });
   document.getElementById("admin-products-btn").addEventListener("click", () => loadAdminProducts().catch(e => {
     document.getElementById("admin-products-list").innerHTML = `<div class="error">${e.message}</div>`;
   }));
