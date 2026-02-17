@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Inka Moss - Registro</title>
+    <link rel="stylesheet" href="/site.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">Inka Moss</div>
+      <nav>
+        <a href="/">Inicio</a>
+        <a href="/catalogo.html">Catálogo</a>
+        <a href="/login.html">Ingresar</a>
+        <a class="cta" href="/register.html">Registrarse</a>
+      </nav>
+    </header>
+
+    <main class="page">
+      <div class="card">
+        <h2>Registro</h2>
+        <label>Nombre</label>
+        <input id="name" type="text" />
+        <label>Email</label>
+        <input id="email" type="email" />
+        <label>Password</label>
+        <input id="password" type="password" />
+        <label>Rol</label>
+        <select id="role">
+          <option value="RECOLECTOR">Recolector</option>
+          <option value="COMPRADOR">Comprador</option>
+        </select>
+        <button id="register-btn" class="secondary">Registrar</button>
+        <div class="notice" id="msg"></div>
+      </div>
+    </main>
+
+    <script src="/register.js"></script>
+  </body>
+</html>
