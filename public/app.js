@@ -32,11 +32,11 @@ function authHeader() {
 
 async function api(path, options = {}) {
   const res = await fetch(apiBase + path, {
+    ...options,
     headers: {
       "Content-Type": "application/json",
       ...(options.headers || {})
-    },
-    ...options
+    }
   });
   const text = await res.text();
   let data = text;
