@@ -215,14 +215,30 @@ async function publishProductFromInput() {
 
 function getCart() {
   try {
-    return JSON.parse(localStorage.getItem("cart") || "[]");
+    const raw = JSON.parse(localStorage.getItem("cart") || "[]");
+    if (!Array.isArray(raw)) return [];
+    // Normalize legacy cart shapes and drop invalid entries.
+    return raw
+      .map((item) => {
+        const productId = item.productId || item.id || "";
+        const quantity = Number(item.quantity || 1);
+        const priceSoles = Number(item.priceSoles || item.price || 0);
+        return {
+          productId,
+          name: item.name || "Producto",
+          priceSoles,
+          quantity
+        };
+      })
+      .filter((item) => item.productId && Number.isFinite(item.quantity) && item.quantity > 0);
   } catch (_) {
     return [];
   }
 }
 
 function saveCart(cart) {
-  localStorage.setItem("cart", JSON.stringify(cart));
+  const cleaned = (Array.isArray(cart) ? cart : []).filter((item) => item.productId && item.quantity > 0);
+  localStorage.setItem("cart", JSON.stringify(cleaned));
 }
 
 function addToCart(product) {
@@ -338,19 +354,29 @@ async function loadCatalog() {
 
 async function createOrder() {
   const cart = getCart();
-  const address = document.getElementById("order-address").value;
+  const address = (document.getElementById("order-address").value || "").trim();
+  if (!state.token) throw new Error("Inicia sesión para crear pedido");
+  if (state.role !== "COMPRADOR") throw new Error("Solo el comprador puede crear pedidos");
   if (cart.length === 0) throw new Error("Carrito vacío");
-  if (!address) throw new Error("Dirección requerida");
+  if (address.length < 5) throw new Error("Dirección requerida");
+
+  const items = cart
+    .map((c) => ({ productId: c.productId, quantity: Number(c.quantity) }))
+    .filter((c) => c.productId && Number.isFinite(c.quantity) && c.quantity > 0);
+  if (items.length === 0) throw new Error("Items inválidos en carrito");
+
   const body = {
     address,
-    items: cart.map((c) => ({ productId: c.productId, quantity: c.quantity }))
+    items
   };
   const data = await api("/api/orders", {
     method: "POST",
     headers: authHeader(),
     body: JSON.stringify(body)
   });
-  document.getElementById("order-msg").textContent = `Pedido creado: ${data.id}`;
+  document.querySelectorAll("#order-msg").forEach((el) => {
+    el.textContent = `Pedido creado: ${data.id}`;
+  });
   saveCart([]);
   renderCart();
   showToast("Pedido creado");
@@ -718,8 +744,9 @@ function wire() {
     if (list) list.innerHTML = `<div class=\"error\">${e.message}</div>`;
   }));
   onId("order-btn", () => createOrder().catch(e => {
-    const msg = document.getElementById("order-msg");
-    if (msg) msg.textContent = e.message;
+    document.querySelectorAll("#order-msg").forEach((el) => {
+      el.textContent = e.message;
+    });
   }));
   onId("buyer-orders-btn", () => loadBuyerOrders().catch(e => {
     const list = document.getElementById("buyer-orders-list");
