@@ -77,8 +77,17 @@ app.post("/api/auth/login", async (req, res) => {
 
 app.post("/api/products", authRequired, roleRequired("RECOLECTOR"), async (req, res) => {
   const { name, type, quantityKg, priceSoles, region, photos } = req.body;
-  if (!name || !type || !quantityKg || !priceSoles || !region || !Array.isArray(photos)) {
-    return res.status(400).json({ error: "Missing required fields" });
+  if (!name || !type || !region) {
+    return res.status(400).json({ error: "Missing required fields: name, type, region" });
+  }
+  if (!Array.isArray(photos) || photos.length === 0 || !photos[0]) {
+    return res.status(400).json({ error: "At least one photo URL is required" });
+  }
+  if (!Number.isFinite(Number(quantityKg)) || Number(quantityKg) <= 0) {
+    return res.status(400).json({ error: "quantityKg must be greater than 0" });
+  }
+  if (!Number.isFinite(Number(priceSoles)) || Number(priceSoles) <= 0) {
+    return res.status(400).json({ error: "priceSoles must be greater than 0" });
   }
   const product = await prisma.product.create({
     data: {
@@ -178,6 +187,38 @@ app.patch("/api/products/:id", authRequired, roleRequired("ADMIN"), async (req, 
   }
   const product = await prisma.product.findUnique({ where: { id: req.params.id } });
   if (!product) return res.status(404).json({ error: "Product not found" });
+  const updated = await prisma.product.update({ where: { id: product.id }, data });
+  return res.json(updated);
+});
+
+app.patch("/api/recolector/products/:id", authRequired, roleRequired("RECOLECTOR"), async (req, res) => {
+  const { name, type, quantityKg, priceSoles, region, photos } = req.body;
+  const data = {};
+  if (name) data.name = name;
+  if (type) data.type = type;
+  if (quantityKg !== undefined) {
+    if (!Number.isFinite(Number(quantityKg)) || Number(quantityKg) <= 0) {
+      return res.status(400).json({ error: "quantityKg must be greater than 0" });
+    }
+    data.quantityKg = Number(quantityKg);
+  }
+  if (priceSoles !== undefined) {
+    if (!Number.isFinite(Number(priceSoles)) || Number(priceSoles) <= 0) {
+      return res.status(400).json({ error: "priceSoles must be greater than 0" });
+    }
+    data.priceSoles = Number(priceSoles);
+  }
+  if (region) data.region = region;
+  if (photos !== undefined) {
+    if (!Array.isArray(photos)) return res.status(400).json({ error: "photos must be an array" });
+    data.photos = photos;
+  }
+
+  const product = await prisma.product.findUnique({ where: { id: req.params.id } });
+  if (!product || product.ownerId !== req.user.id) {
+    return res.status(404).json({ error: "Product not found" });
+  }
+
   const updated = await prisma.product.update({ where: { id: product.id }, data });
   return res.json(updated);
 });

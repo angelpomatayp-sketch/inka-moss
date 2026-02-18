@@ -162,11 +162,16 @@ function applyRoleUI() {
 
 async function createProduct() {
   if (!validateRequired(["prod-name","prod-type","prod-qty","prod-price","prod-region","prod-photo"])) return;
+  const quantityKg = Number(document.getElementById("prod-qty").value);
+  const priceSoles = Number(document.getElementById("prod-price").value);
+  if (!Number.isFinite(quantityKg) || quantityKg <= 0) throw new Error("Cantidad inválida");
+  if (!Number.isFinite(priceSoles) || priceSoles <= 0) throw new Error("Precio inválido");
+
   const body = {
     name: document.getElementById("prod-name").value,
     type: document.getElementById("prod-type").value,
-    quantityKg: Number(document.getElementById("prod-qty").value),
-    priceSoles: Number(document.getElementById("prod-price").value),
+    quantityKg,
+    priceSoles,
     region: document.getElementById("prod-region").value,
     photos: [document.getElementById("prod-photo").value]
   };
@@ -756,30 +761,41 @@ function wire() {
   onId("close-cart", closeCart);
 
   onId("edit-save-btn", async () => {
-    const id = document.getElementById("edit-id").value;
-    if (!validateRequired(["edit-name","edit-type","edit-qty","edit-price","edit-region"])) return;
-    const body = {
-      name: document.getElementById("edit-name").value,
-      type: document.getElementById("edit-type").value,
-      quantityKg: Number(document.getElementById("edit-qty").value),
-      priceSoles: Number(document.getElementById("edit-price").value),
-      region: document.getElementById("edit-region").value,
-      photos: [document.getElementById("edit-photo").value]
-    };
-    await api(`/api/products/${id}`, { method: "PATCH", headers: authHeader(), body: JSON.stringify(body) });
+    try {
+      const id = document.getElementById("edit-id").value;
+      if (!validateRequired(["edit-name","edit-type","edit-qty","edit-price","edit-region"])) return;
+      const quantityKg = Number(document.getElementById("edit-qty").value);
+      const priceSoles = Number(document.getElementById("edit-price").value);
+      if (!Number.isFinite(quantityKg) || quantityKg <= 0) throw new Error("Cantidad inválida");
+      if (!Number.isFinite(priceSoles) || priceSoles <= 0) throw new Error("Precio inválido");
 
-    const zone = document.getElementById("edit-zone").value;
-    const community = document.getElementById("edit-community").value;
-    const harvestDate = document.getElementById("edit-date").value;
-    if (zone && community && harvestDate) {
-      await api(`/api/products/${id}/traceability`, {
-        method: "POST",
-        headers: authHeader(),
-        body: JSON.stringify({ zone, community, harvestDate })
-      });
+      const body = {
+        name: document.getElementById("edit-name").value,
+        type: document.getElementById("edit-type").value,
+        quantityKg,
+        priceSoles,
+        region: document.getElementById("edit-region").value,
+        photos: [document.getElementById("edit-photo").value]
+      };
+      const editPath = state.role === "ADMIN" ? `/api/products/${id}` : `/api/recolector/products/${id}`;
+      await api(editPath, { method: "PATCH", headers: authHeader(), body: JSON.stringify(body) });
+
+      const zone = document.getElementById("edit-zone").value;
+      const community = document.getElementById("edit-community").value;
+      const harvestDate = document.getElementById("edit-date").value;
+      if (zone && community && harvestDate) {
+        await api(`/api/products/${id}/traceability`, {
+          method: "POST",
+          headers: authHeader(),
+          body: JSON.stringify({ zone, community, harvestDate })
+        });
+      }
+      closeEditModal();
+      loadMyProducts();
+      showToast("Producto actualizado");
+    } catch (e) {
+      showToast(e.message, "error");
     }
-    closeEditModal();
-    loadMyProducts();
   });
   onId("admin-products-btn", () => loadAdminProducts().catch(e => {
     const list = document.getElementById("admin-products-list");
